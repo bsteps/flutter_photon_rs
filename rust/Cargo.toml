@@ -1,0 +1,17 @@
+[package]
+name = "image_manipulation"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "image_manipulation"
+# this is needed to build for iOS and Android.
+crate-type = ["cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+flutter_rust_bridge = "1"
+anyhow = { version = "1.0.56", features = ["backtrace"] }
+photon-rs = "0.3.1"
+image = "0.24.1"
+img-parts = "0.2.3"
