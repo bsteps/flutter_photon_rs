@@ -2,6 +2,8 @@ import 'dart:ffi' as ffi;
 
 import 'dart:io';
 
+import 'package:image_manipulation/src/bridge_generated.dart';
+
 ffi.DynamicLibrary openDynLib(String path) {
   if (Platform.environment.containsKey('FLUTTER_TEST')) {
     return ffi.DynamicLibrary.open("build/test/arm64-v8a/$path");
@@ -13,4 +15,26 @@ ffi.DynamicLibrary openDynLib(String path) {
             ? ffi.DynamicLibrary.executable()
             : ffi.DynamicLibrary.open(path);
   }
+}
+
+PhotonFilter toPhotonFilterHelper({
+  required String name,
+  int value1 = 1,
+  int value2 = 1,
+  int value3 = 1,
+  int value4 = 1,
+}) {
+  return PhotonFilter(
+    name: name,
+    val1: value1,
+    val2: value2,
+    val3: value3,
+    val4: value4,
+    rgba: Rgba(
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 0,
+    ),
+  );
 }

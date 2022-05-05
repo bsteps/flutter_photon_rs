@@ -32,44 +32,42 @@ pub extern "C" fn wire_manipulate_image(port_: i64, a: *mut wire_ManipulationInp
     )
 }
 
-#[no_mangle]
-pub extern "C" fn wire_greyscale_image(port_: i64, original_bytes: *mut wire_uint_8_list) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
-        WrapInfo {
-            debug_name: "greyscale_image",
-            port: Some(port_),
-            mode: FfiCallMode::Normal,
-        },
-        move || {
-            let api_original_bytes = original_bytes.wire2api();
-            move |task_callback| greyscale_image(api_original_bytes)
-        },
-    )
-}
-
-#[no_mangle]
-pub extern "C" fn wire_checking(port_: i64) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
-        WrapInfo {
-            debug_name: "checking",
-            port: Some(port_),
-            mode: FfiCallMode::Normal,
-        },
-        move || move |task_callback| Ok(checking()),
-    )
-}
-
 // Section: wire structs
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_list_photon_filter {
+    ptr: *mut wire_PhotonFilter,
+    len: i32,
+}
 
 #[repr(C)]
 #[derive(Clone)]
 pub struct wire_ManipulationInput {
     original_bytes: *mut wire_uint_8_list,
-    greyscale: bool,
-    threshold: bool,
-    threshold_amount: u32,
+    filters: *mut wire_list_photon_filter,
     output_format: i32,
     quality: u8,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_PhotonFilter {
+    name: *mut wire_uint_8_list,
+    val1: i64,
+    val2: i64,
+    val3: i64,
+    val4: i64,
+    rgba: *mut wire_Rgba,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_Rgba {
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
 }
 
 #[repr(C)]
@@ -88,6 +86,20 @@ pub struct wire_uint_8_list {
 #[no_mangle]
 pub extern "C" fn new_box_autoadd_manipulation_input() -> *mut wire_ManipulationInput {
     support::new_leak_box_ptr(wire_ManipulationInput::new_with_null_ptr())
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_rgba() -> *mut wire_Rgba {
+    support::new_leak_box_ptr(wire_Rgba::new_with_null_ptr())
+}
+
+#[no_mangle]
+pub extern "C" fn new_list_photon_filter(len: i32) -> *mut wire_list_photon_filter {
+    let wrap = wire_list_photon_filter {
+        ptr: support::new_leak_vec_ptr(<wire_PhotonFilter>::new_with_null_ptr(), len),
+        len,
+    };
+    support::new_leak_box_ptr(wrap)
 }
 
 #[no_mangle]
@@ -118,9 +130,10 @@ where
     }
 }
 
-impl Wire2Api<bool> for bool {
-    fn wire2api(self) -> bool {
-        self
+impl Wire2Api<String> for *mut wire_uint_8_list {
+    fn wire2api(self) -> String {
+        let vec: Vec<u8> = self.wire2api();
+        String::from_utf8_lossy(&vec).into_owned()
     }
 }
 
@@ -131,13 +144,34 @@ impl Wire2Api<ManipulationInput> for *mut wire_ManipulationInput {
     }
 }
 
+impl Wire2Api<Box<Rgba>> for *mut wire_Rgba {
+    fn wire2api(self) -> Box<Rgba> {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        (*wrap).wire2api().into()
+    }
+}
+
+impl Wire2Api<i64> for i64 {
+    fn wire2api(self) -> i64 {
+        self
+    }
+}
+
+impl Wire2Api<Vec<PhotonFilter>> for *mut wire_list_photon_filter {
+    fn wire2api(self) -> Vec<PhotonFilter> {
+        let vec = unsafe {
+            let wrap = support::box_from_leak_ptr(self);
+            support::vec_from_leak_ptr(wrap.ptr, wrap.len)
+        };
+        vec.into_iter().map(Wire2Api::wire2api).collect()
+    }
+}
+
 impl Wire2Api<ManipulationInput> for wire_ManipulationInput {
     fn wire2api(self) -> ManipulationInput {
         ManipulationInput {
             original_bytes: self.original_bytes.wire2api(),
-            greyscale: self.greyscale.wire2api(),
-            threshold: self.threshold.wire2api(),
-            threshold_amount: self.threshold_amount.wire2api(),
+            filters: self.filters.wire2api(),
             output_format: self.output_format.wire2api(),
             quality: self.quality.wire2api(),
         }
@@ -155,9 +189,27 @@ impl Wire2Api<OutputFormat> for i32 {
     }
 }
 
-impl Wire2Api<u32> for u32 {
-    fn wire2api(self) -> u32 {
-        self
+impl Wire2Api<PhotonFilter> for wire_PhotonFilter {
+    fn wire2api(self) -> PhotonFilter {
+        PhotonFilter {
+            name: self.name.wire2api(),
+            val1: self.val1.wire2api(),
+            val2: self.val2.wire2api(),
+            val3: self.val3.wire2api(),
+            val4: self.val4.wire2api(),
+            rgba: self.rgba.wire2api(),
+        }
+    }
+}
+
+impl Wire2Api<Rgba> for wire_Rgba {
+    fn wire2api(self) -> Rgba {
+        Rgba {
+            r: self.r.wire2api(),
+            g: self.g.wire2api(),
+            b: self.b.wire2api(),
+            a: self.a.wire2api(),
+        }
     }
 }
 
@@ -192,11 +244,33 @@ impl NewWithNullPtr for wire_ManipulationInput {
     fn new_with_null_ptr() -> Self {
         Self {
             original_bytes: core::ptr::null_mut(),
-            greyscale: Default::default(),
-            threshold: Default::default(),
-            threshold_amount: Default::default(),
+            filters: core::ptr::null_mut(),
             output_format: Default::default(),
             quality: Default::default(),
+        }
+    }
+}
+
+impl NewWithNullPtr for wire_PhotonFilter {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            name: core::ptr::null_mut(),
+            val1: Default::default(),
+            val2: Default::default(),
+            val3: Default::default(),
+            val4: Default::default(),
+            rgba: core::ptr::null_mut(),
+        }
+    }
+}
+
+impl NewWithNullPtr for wire_Rgba {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            r: Default::default(),
+            g: Default::default(),
+            b: Default::default(),
+            a: Default::default(),
         }
     }
 }

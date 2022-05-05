@@ -14,26 +14,17 @@ import 'dart:ffi' as ffi;
 abstract class ImageManipulation {
   Future<Uint8List> manipulateImage(
       {required ManipulationInput a, dynamic hint});
-
-  Future<Uint8List> greyscaleImage(
-      {required Uint8List originalBytes, dynamic hint});
-
-  Future<String> checking({dynamic hint});
 }
 
 class ManipulationInput {
   final Uint8List originalBytes;
-  final bool greyscale;
-  final bool threshold;
-  final int thresholdAmount;
+  final List<PhotonFilter> filters;
   final OutputFormat outputFormat;
   final int quality;
 
   ManipulationInput({
     required this.originalBytes,
-    required this.greyscale,
-    required this.threshold,
-    required this.thresholdAmount,
+    required this.filters,
     required this.outputFormat,
     required this.quality,
   });
@@ -43,6 +34,38 @@ enum OutputFormat {
   Png,
   Jpeg,
   Gif,
+}
+
+class PhotonFilter {
+  final String name;
+  final int val1;
+  final int val2;
+  final int val3;
+  final int val4;
+  final Rgba rgba;
+
+  PhotonFilter({
+    required this.name,
+    required this.val1,
+    required this.val2,
+    required this.val3,
+    required this.val4,
+    required this.rgba,
+  });
+}
+
+class Rgba {
+  final int r;
+  final int g;
+  final int b;
+  final int a;
+
+  Rgba({
+    required this.r,
+    required this.g,
+    required this.b,
+    required this.a,
+  });
 }
 
 class ImageManipulationImpl extends FlutterRustBridgeBase<ImageManipulationWire>
@@ -66,35 +89,9 @@ class ImageManipulationImpl extends FlutterRustBridgeBase<ImageManipulationWire>
         hint: hint,
       ));
 
-  Future<Uint8List> greyscaleImage(
-          {required Uint8List originalBytes, dynamic hint}) =>
-      executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => inner.wire_greyscale_image(
-            port_, _api2wire_uint_8_list(originalBytes)),
-        parseSuccessData: _wire2api_ZeroCopyBuffer_Uint8List,
-        constMeta: const FlutterRustBridgeTaskConstMeta(
-          debugName: "greyscale_image",
-          argNames: ["originalBytes"],
-        ),
-        argValues: [originalBytes],
-        hint: hint,
-      ));
-
-  Future<String> checking({dynamic hint}) =>
-      executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => inner.wire_checking(port_),
-        parseSuccessData: _wire2api_String,
-        constMeta: const FlutterRustBridgeTaskConstMeta(
-          debugName: "checking",
-          argNames: [],
-        ),
-        argValues: [],
-        hint: hint,
-      ));
-
   // Section: api2wire
-  int _api2wire_bool(bool raw) {
-    return raw ? 1 : 0;
+  ffi.Pointer<wire_uint_8_list> _api2wire_String(String raw) {
+    return _api2wire_uint_8_list(utf8.encoder.convert(raw));
   }
 
   ffi.Pointer<wire_ManipulationInput> _api2wire_box_autoadd_manipulation_input(
@@ -104,12 +101,27 @@ class ImageManipulationImpl extends FlutterRustBridgeBase<ImageManipulationWire>
     return ptr;
   }
 
-  int _api2wire_output_format(OutputFormat raw) {
-    return raw.index;
+  ffi.Pointer<wire_Rgba> _api2wire_box_rgba(Rgba raw) {
+    final ptr = inner.new_box_rgba();
+    _api_fill_to_wire_rgba(raw, ptr.ref);
+    return ptr;
   }
 
-  int _api2wire_u32(int raw) {
+  int _api2wire_i64(int raw) {
     return raw;
+  }
+
+  ffi.Pointer<wire_list_photon_filter> _api2wire_list_photon_filter(
+      List<PhotonFilter> raw) {
+    final ans = inner.new_list_photon_filter(raw.length);
+    for (var i = 0; i < raw.length; ++i) {
+      _api_fill_to_wire_photon_filter(raw[i], ans.ref.ptr[i]);
+    }
+    return ans;
+  }
+
+  int _api2wire_output_format(OutputFormat raw) {
+    return raw.index;
   }
 
   int _api2wire_u8(int raw) {
@@ -129,22 +141,37 @@ class ImageManipulationImpl extends FlutterRustBridgeBase<ImageManipulationWire>
     _api_fill_to_wire_manipulation_input(apiObj, wireObj.ref);
   }
 
+  void _api_fill_to_wire_box_rgba(Rgba apiObj, ffi.Pointer<wire_Rgba> wireObj) {
+    _api_fill_to_wire_rgba(apiObj, wireObj.ref);
+  }
+
   void _api_fill_to_wire_manipulation_input(
       ManipulationInput apiObj, wire_ManipulationInput wireObj) {
     wireObj.original_bytes = _api2wire_uint_8_list(apiObj.originalBytes);
-    wireObj.greyscale = _api2wire_bool(apiObj.greyscale);
-    wireObj.threshold = _api2wire_bool(apiObj.threshold);
-    wireObj.threshold_amount = _api2wire_u32(apiObj.thresholdAmount);
+    wireObj.filters = _api2wire_list_photon_filter(apiObj.filters);
     wireObj.output_format = _api2wire_output_format(apiObj.outputFormat);
     wireObj.quality = _api2wire_u8(apiObj.quality);
+  }
+
+  void _api_fill_to_wire_photon_filter(
+      PhotonFilter apiObj, wire_PhotonFilter wireObj) {
+    wireObj.name = _api2wire_String(apiObj.name);
+    wireObj.val1 = _api2wire_i64(apiObj.val1);
+    wireObj.val2 = _api2wire_i64(apiObj.val2);
+    wireObj.val3 = _api2wire_i64(apiObj.val3);
+    wireObj.val4 = _api2wire_i64(apiObj.val4);
+    wireObj.rgba = _api2wire_box_rgba(apiObj.rgba);
+  }
+
+  void _api_fill_to_wire_rgba(Rgba apiObj, wire_Rgba wireObj) {
+    wireObj.r = _api2wire_u8(apiObj.r);
+    wireObj.g = _api2wire_u8(apiObj.g);
+    wireObj.b = _api2wire_u8(apiObj.b);
+    wireObj.a = _api2wire_u8(apiObj.a);
   }
 }
 
 // Section: wire2api
-String _wire2api_String(dynamic raw) {
-  return raw as String;
-}
-
 Uint8List _wire2api_ZeroCopyBuffer_Uint8List(dynamic raw) {
   return raw as Uint8List;
 }
@@ -196,37 +223,6 @@ class ImageManipulationWire implements FlutterRustBridgeWireBase {
   late final _wire_manipulate_image = _wire_manipulate_imagePtr
       .asFunction<void Function(int, ffi.Pointer<wire_ManipulationInput>)>();
 
-  void wire_greyscale_image(
-    int port_,
-    ffi.Pointer<wire_uint_8_list> original_bytes,
-  ) {
-    return _wire_greyscale_image(
-      port_,
-      original_bytes,
-    );
-  }
-
-  late final _wire_greyscale_imagePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(ffi.Int64,
-              ffi.Pointer<wire_uint_8_list>)>>('wire_greyscale_image');
-  late final _wire_greyscale_image = _wire_greyscale_imagePtr
-      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
-
-  void wire_checking(
-    int port_,
-  ) {
-    return _wire_checking(
-      port_,
-    );
-  }
-
-  late final _wire_checkingPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
-          'wire_checking');
-  late final _wire_checking =
-      _wire_checkingPtr.asFunction<void Function(int)>();
-
   ffi.Pointer<wire_ManipulationInput> new_box_autoadd_manipulation_input() {
     return _new_box_autoadd_manipulation_input();
   }
@@ -237,6 +233,31 @@ class ImageManipulationWire implements FlutterRustBridgeWireBase {
   late final _new_box_autoadd_manipulation_input =
       _new_box_autoadd_manipulation_inputPtr
           .asFunction<ffi.Pointer<wire_ManipulationInput> Function()>();
+
+  ffi.Pointer<wire_Rgba> new_box_rgba() {
+    return _new_box_rgba();
+  }
+
+  late final _new_box_rgbaPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<wire_Rgba> Function()>>(
+          'new_box_rgba');
+  late final _new_box_rgba =
+      _new_box_rgbaPtr.asFunction<ffi.Pointer<wire_Rgba> Function()>();
+
+  ffi.Pointer<wire_list_photon_filter> new_list_photon_filter(
+    int len,
+  ) {
+    return _new_list_photon_filter(
+      len,
+    );
+  }
+
+  late final _new_list_photon_filterPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_list_photon_filter> Function(
+              ffi.Int32)>>('new_list_photon_filter');
+  late final _new_list_photon_filter = _new_list_photon_filterPtr
+      .asFunction<ffi.Pointer<wire_list_photon_filter> Function(int)>();
 
   ffi.Pointer<wire_uint_8_list> new_uint_8_list(
     int len,
@@ -289,17 +310,49 @@ class wire_uint_8_list extends ffi.Struct {
   external int len;
 }
 
+class wire_Rgba extends ffi.Struct {
+  @ffi.Uint8()
+  external int r;
+
+  @ffi.Uint8()
+  external int g;
+
+  @ffi.Uint8()
+  external int b;
+
+  @ffi.Uint8()
+  external int a;
+}
+
+class wire_PhotonFilter extends ffi.Struct {
+  external ffi.Pointer<wire_uint_8_list> name;
+
+  @ffi.Int64()
+  external int val1;
+
+  @ffi.Int64()
+  external int val2;
+
+  @ffi.Int64()
+  external int val3;
+
+  @ffi.Int64()
+  external int val4;
+
+  external ffi.Pointer<wire_Rgba> rgba;
+}
+
+class wire_list_photon_filter extends ffi.Struct {
+  external ffi.Pointer<wire_PhotonFilter> ptr;
+
+  @ffi.Int32()
+  external int len;
+}
+
 class wire_ManipulationInput extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> original_bytes;
 
-  @ffi.Uint8()
-  external int greyscale;
-
-  @ffi.Uint8()
-  external int threshold;
-
-  @ffi.Uint32()
-  external int threshold_amount;
+  external ffi.Pointer<wire_list_photon_filter> filters;
 
   @ffi.Int32()
   external int output_format;
