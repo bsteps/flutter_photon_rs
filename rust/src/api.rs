@@ -1,9 +1,12 @@
 extern crate photon_rs;
 
+use std::io::Cursor;
+
 use anyhow::Result;
-use flutter_rust_bridge::{ZeroCopyBuffer};
+use flutter_rust_bridge::ZeroCopyBuffer;
 use image::{DynamicImage::ImageRgba8, ImageBuffer, ImageOutputFormat};
-use img_parts::{DynImage, ImageEXIF, ImageICC};
+// use img_parts::DynImage;
+// use img_parts::{DynImage, ImageEXIF, ImageICC};
 use photon_rs::{
     channels::{
         alter_channel, remove_blue_channel, remove_green_channel, remove_red_channel, swap_channels,
@@ -21,7 +24,6 @@ use photon_rs::{
 };
 
 pub use photon_rs::Rgba as PhotonRgba;
-use std::io::Cursor;
 
 #[derive(Default)]
 pub struct ManipulationInput {
@@ -47,7 +49,6 @@ pub struct Rgba {
     pub a: u8,
 }
 
-
 impl Rgba {
     pub fn to_photon_rgba(&self) -> PhotonRgba {
         PhotonRgba::new(self.r, self.g, self.b, self.a)
@@ -55,7 +56,8 @@ impl Rgba {
 }
 
 impl PhotonFilter {
-    pub fn apply(&self, img: &mut PhotonImage) {
+    pub fn apply(&self, mut img1: PhotonImage) -> PhotonImage {
+        let img = &mut img1;
         if self.name == "grayscale" {
             grayscale(img);
         }
@@ -107,7 +109,7 @@ impl PhotonFilter {
 
         // Transfromation
         if self.name == "crop" {
-            crop(
+            return crop(
                 img,
                 self.val1 as u32,
                 self.val2 as u32,
@@ -122,63 +124,58 @@ impl PhotonFilter {
             flipv(img);
         }
         if self.name == "padding_bottom" {
-            padding_bottom(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return padding_bottom(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "padding_left" {
-            padding_left(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return padding_left(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "padding_right" {
-            padding_right(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return padding_right(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "padding_top" {
-            padding_top(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return padding_top(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "padding_uniform" {
-            padding_uniform(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return padding_uniform(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "resize" {
-            match self.val3 {
-                1 => {
-                    resize(
-                        img,
-                        self.val1 as u32,
-                        self.val1 as u32,
-                        SamplingFilter::Nearest,
-                    );
-                }
-                2 => {
-                    resize(
-                        img,
-                        self.val1 as u32,
-                        self.val1 as u32,
-                        SamplingFilter::Triangle,
-                    );
-                }
-                3 => {
-                    resize(
-                        img,
-                        self.val1 as u32,
-                        self.val1 as u32,
-                        SamplingFilter::CatmullRom,
-                    );
-                }
-                4 => {
-                    resize(
-                        img,
-                        self.val1 as u32,
-                        self.val1 as u32,
-                        SamplingFilter::Gaussian,
-                    );
-                }
-                5 => {
-                    resize(
-                        img,
-                        self.val1 as u32,
-                        self.val1 as u32,
-                        SamplingFilter::Lanczos3,
-                    );
-                }
-                _ => (),
+            return match self.val3 {
+                1 => resize(
+                    img,
+                    self.val1 as u32,
+                    self.val2 as u32,
+                    SamplingFilter::Nearest,
+                ),
+                2 => resize(
+                    img,
+                    self.val1 as u32,
+                    self.val2 as u32,
+                    SamplingFilter::Triangle,
+                ),
+                3 => resize(
+                    img,
+                    self.val1 as u32,
+                    self.val2 as u32,
+                    SamplingFilter::CatmullRom,
+                ),
+                4 => resize(
+                    img,
+                    self.val1 as u32,
+                    self.val2 as u32,
+                    SamplingFilter::Gaussian,
+                ),
+                5 => resize(
+                    img,
+                    self.val1 as u32,
+                    self.val2 as u32,
+                    SamplingFilter::Lanczos3,
+                ),
+                _ => resize(
+                    img,
+                    self.val1 as u32,
+                    self.val2 as u32,
+                    SamplingFilter::Nearest,
+                ),
             };
         }
 
@@ -212,6 +209,8 @@ impl PhotonFilter {
         if preset_filters.contains(&value) {
             filter(img, &self.name);
         }
+
+        img1
     }
 }
 
@@ -229,43 +228,44 @@ pub enum OutputFormat {
 
 impl self::ManipulationInput {
     pub fn save(&self) -> Result<ZeroCopyBuffer<Vec<u8>>> {
-        let original_bytes = self.original_bytes.clone();
-        let mut img = photon_rs::native::open_image_from_bytes(&original_bytes)?;
-
-        let (iccp, exif) = DynImage::from_bytes(original_bytes.into())
-            .expect("image loaded")
-            .map_or((None, None), |dimg| (dimg.icc_profile(), dimg.exif()));
+        let mut img = photon_rs::native::open_image_from_bytes(&(self.original_bytes))?;
 
         for filter in self.filters.iter() {
-            filter.apply(&mut img);
+            img = filter.apply(img);
         }
 
-        let raw_pix = img.get_raw_pixels();
-        let mut bytes = Vec::with_capacity(raw_pix.len());
-        let img_buffer = ImageBuffer::from_vec(img.get_width(), img.get_height(), raw_pix).unwrap();
+        let raw_pixels = img.get_raw_pixels();
+        let _len = raw_pixels.len();
+        let img_buffer =
+            ImageBuffer::from_vec(img.get_width(), img.get_height(), raw_pixels).unwrap();
         let img = ImageRgba8(img_buffer);
 
         let format = match self.output_format {
             OutputFormat::Png => ImageOutputFormat::Png,
-            OutputFormat::Jpeg => ImageOutputFormat::Jpeg(self.quality),
+            OutputFormat::Jpeg => ImageOutputFormat::Jpeg(100),
             OutputFormat::Gif => ImageOutputFormat::Gif,
         };
+        let mut bytes = Vec::with_capacity(_len);
 
+        // let (iccp, exif) = DynImage::from_bytes(self.original_bytes.clone().into())
+        //     .expect("image loaded")
+        //     .map_or((None, None), |dimg| (dimg.icc_profile(), dimg.exif()));
+
+        // img.write_to(&mut Cursor::new(&mut bytes), format).expect("Error Writing To Buffer");
         img.write_to(&mut Cursor::new(&mut bytes), format)
             .expect("Error Writing To Buffer");
-
-        if iccp.is_some() || exif.is_some() {
-            match DynImage::from_bytes(bytes.clone().into()).expect("image loaded") {
-                Some(mut dimg) => {
-                    dimg.set_icc_profile(iccp);
-                    dimg.set_exif(exif);
-                    dimg.encoder()
-                        .write_to(&mut bytes)
-                        .expect("Error Writing To Buffer");
-                }
-                None => {}
-            };
-        }
+        // if iccp.is_some() || exif.is_some() {
+        //     match DynImage::from_bytes(bytes.clone().into()).expect("image loaded") {
+        //         Some(mut dimg) => {
+        //             dimg.set_icc_profile(iccp);
+        //             dimg.set_exif(exif);
+        //             dimg.encoder()
+        //                 .write_to(&mut bytes)
+        //                 .expect("Error Writing To Buffer");
+        //         }
+        //         None => {}
+        //     };
+        // }
 
         Ok(ZeroCopyBuffer(bytes))
     }

@@ -58,19 +58,20 @@ class FilterList extends StatelessWidget {
                   //   builder: (context, snapshot) {
                   // return PreviewButton(
                   ValueListenableBuilder<Set<Filter>>(
-                      valueListenable: filters,
-                      builder: (context, value, child) {
-                        return PreviewButton(
-                          // image: ImageMemoryWithLoading(
-                          //   image: snapshot.data != null ? snapshot.data! : value,
-                          //   height: 100,
-                          //   width: 100,
-                          //   fit: BoxFit.cover,
-                          // ),
-                          isSelected: value.contains(listedFilters[index]),
-                          name: listedFilters[index].fullName,
-                        );
-                      }),
+                    valueListenable: filters,
+                    builder: (context, value, child) {
+                      return PreviewButton(
+                        // image: ImageMemoryWithLoading(
+                        //   image: snapshot.data != null ? snapshot.data! : value,
+                        //   height: 100,
+                        //   width: 100,
+                        //   fit: BoxFit.cover,
+                        // ),
+                        isSelected: value.contains(listedFilters[index]),
+                        name: listedFilters[index].fullName,
+                      );
+                    },
+                  ),
                   // );
                   //   },
                   // ),

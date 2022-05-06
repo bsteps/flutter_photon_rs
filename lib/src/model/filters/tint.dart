@@ -20,6 +20,7 @@ class Tint with _$Tint, Filter {
   @Implements<Filter>()
   const factory Tint.bluechrome() = _TintBluechrome;
 
+  @override
   String get name {
     return map(
       radio: (_) => "radio",
@@ -30,6 +31,7 @@ class Tint with _$Tint, Filter {
     );
   }
 
+  @override
   String get fullName {
     return name.split('_').map((e) => "${e[0].toUpperCase()}${e.substring(1)}").join(' ');
   }

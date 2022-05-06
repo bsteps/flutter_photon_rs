@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Transform;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_manipulation/image_manipulation.dart';
 import 'package:image_manipulation_example/widgets/filter_list.dart';
@@ -76,6 +76,62 @@ const listedChannelFilters = [
   Channel.removeRedChannel(),
 ];
 
+const listedTransformationFilters = [
+  Transform.crop(
+    x1: 20,
+    y1: 20,
+    x2: 50,
+    y2: 50,
+  ),
+  Transform.flipH(),
+  Transform.flipV(),
+  Transform.paddingBottom(
+    color: Colors.blue,
+    padding: 20,
+  ),
+  Transform.paddingTop(
+    color: Colors.blue,
+    padding: 20,
+  ),
+  Transform.paddingRight(
+    color: Colors.blue,
+    padding: 20,
+  ),
+  Transform.paddingLeft(
+    color: Colors.blue,
+    padding: 20,
+  ),
+  Transform.paddingUniform(
+    color: Colors.blue,
+    padding: 20,
+  ),
+  Transform.resize(
+    height: 300,
+    width: 200,
+    samplingFilter: SamplingFilter.nearest,
+  ),
+  Transform.resize(
+    height: 300,
+    width: 200,
+    samplingFilter: SamplingFilter.catmullRom,
+  ),
+  Transform.resize(
+    height: 300,
+    width: 200,
+    samplingFilter: SamplingFilter.gaussian,
+  ),
+  Transform.resize(
+    height: 300,
+    width: 200,
+    samplingFilter: SamplingFilter.lanczos3,
+  ),
+  Transform.resize(
+    height: 300,
+    width: 200,
+    samplingFilter: SamplingFilter.triangle,
+  ),
+];
+
 class _MyAppState extends State<MyApp> {
   ValueNotifier<Uint8List?> originalImage = ValueNotifier(null);
   Uint8List? processedImage;
@@ -117,11 +173,14 @@ class _MyAppState extends State<MyApp> {
                   return ValueListenableBuilder<Set<Filter>>(
                     valueListenable: filters,
                     builder: (context, filters, child) {
+                      log(filters.toString());
+
                       if (value == null || filters.isNotEmpty) {
                         return Container();
                       }
 
                       if (filters.isEmpty) {
+                        log("Here");
                         return ImageMemoryWithLoading(
                           image: value,
                           width: MediaQuery.of(context).size.width,
@@ -148,6 +207,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                     builder: (context, snapshot) {
                       processedImage = snapshot.data;
+
                       return ImageMemoryWithLoading(
                         image: snapshot.data == null ? originalImage.value! : snapshot.data!,
                         width: MediaQuery.of(context).size.width,
@@ -294,6 +354,42 @@ class _MyAppState extends State<MyApp> {
                       child: FilterList(
                         filters: filters,
                         listedFilters: listedChannelFilters,
+                        originalImage: originalImage,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 70,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ValueListenableBuilder<Uint8List?>(
+                      valueListenable: originalImage,
+                      builder: (context, value, child) {
+                        if (value == null) return Container();
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          child: Text(
+                            'Transformation',
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Expanded(
+                      child: FilterList(
+                        filters: filters,
+                        listedFilters: listedTransformationFilters,
                         originalImage: originalImage,
                       ),
                     ),

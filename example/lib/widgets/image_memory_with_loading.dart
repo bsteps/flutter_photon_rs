@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -17,7 +20,8 @@ class ImageMemoryWithLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.memory(
+    log("rebuilded image");
+    final imageWidget = Image.memory(
       image,
       height: height,
       width: width,
@@ -36,6 +40,30 @@ class ImageMemoryWithLoading extends StatelessWidget {
                 ),
         );
       },
+    );
+
+    final completer = Completer<ui.Image>();
+    imageWidget.image.resolve(const ImageConfiguration()).addListener(ImageStreamListener(
+      (image, synchronousCall) {
+        completer.complete(image.image);
+      },
+    ));
+    return Stack(
+      children: [
+        imageWidget,
+        FutureBuilder<ui.Image>(
+          future: completer.future,
+          builder: (BuildContext context, AsyncSnapshot<ui.Image> snapshot) {
+            if (snapshot.hasData) {
+              return Text(
+                '${snapshot.data?.width}x${snapshot.data?.height}',
+              );
+            } else {
+              return const Text('Loading...');
+            }
+          },
+        ),
+      ],
     );
   }
 }

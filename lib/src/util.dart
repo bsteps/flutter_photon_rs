@@ -23,6 +23,7 @@ PhotonFilter toPhotonFilterHelper({
   int value2 = 1,
   int value3 = 1,
   int value4 = 1,
+  Rgba? rgba,
 }) {
   return PhotonFilter(
     name: name,
@@ -30,11 +31,12 @@ PhotonFilter toPhotonFilterHelper({
     val2: value2,
     val3: value3,
     val4: value4,
-    rgba: Rgba(
-      r: 0,
-      g: 0,
-      b: 0,
-      a: 0,
-    ),
+    rgba: rgba ??
+        Rgba(
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 0,
+        ),
   );
 }

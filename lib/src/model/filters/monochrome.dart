@@ -30,6 +30,7 @@ class Monochrome with _$Monochrome, Filter {
   @Implements<Filter>()
   const factory Monochrome.threshold(int value) = _MonochromeThreshold;
 
+  @override
   String get name {
     return map(
       sepia: (value) {
@@ -65,6 +66,7 @@ class Monochrome with _$Monochrome, Filter {
     );
   }
 
+  @override
   String get fullName {
     return name.split('_').map((e) => "${e[0].toUpperCase()}${e.substring(1)}").join(' ');
   }

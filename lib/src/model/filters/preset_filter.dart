@@ -44,6 +44,7 @@ class PresetFilter with _$PresetFilter, Filter {
   @Implements<Filter>()
   const factory PresetFilter.lofi() = _PresetFilterLofi;
 
+  @override
   String get name {
     return map(
       oceanic: (_) => "oceanic",
@@ -66,6 +67,7 @@ class PresetFilter with _$PresetFilter, Filter {
     );
   }
 
+  @override
   String get fullName {
     return name.split('_').map((e) => "${e[0].toUpperCase()}${e.substring(1)}").join(' ');
   }

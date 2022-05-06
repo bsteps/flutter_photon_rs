@@ -4,6 +4,7 @@ export './monochrome.dart';
 export './preset_filter.dart';
 export './tint.dart';
 export './channel.dart';
+export './transform.dart';
 
 abstract class Filter {
   String get fullName;

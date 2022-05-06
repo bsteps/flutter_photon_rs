@@ -41,11 +41,11 @@ Future<Uint8List> manipulateImage(ManipulationInput i) async {
   if (kDebugMode) {
     stopwatch = Stopwatch()..start();
   }
-  final value = rustApi.manipulateImage(
+  final value = await rustApi.manipulateImage(
     a: i,
   );
-  if (kDebugMode) {
-    log(stopwatch?.elapsed.toString() ?? '');
+  if (kDebugMode && stopwatch != null) {
+    log("${stopwatch.elapsed.inMilliseconds}ms");
   }
   return value;
 }
