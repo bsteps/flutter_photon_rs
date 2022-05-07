@@ -42,6 +42,7 @@ class PhotonFilter {
   final int val2;
   final int val3;
   final int val4;
+  final Uint8List watermarkBytes;
   final Rgba rgba;
 
   PhotonFilter({
@@ -50,6 +51,7 @@ class PhotonFilter {
     required this.val2,
     required this.val3,
     required this.val4,
+    required this.watermarkBytes,
     required this.rgba,
   });
 }
@@ -160,6 +162,7 @@ class ImageManipulationImpl extends FlutterRustBridgeBase<ImageManipulationWire>
     wireObj.val2 = _api2wire_i64(apiObj.val2);
     wireObj.val3 = _api2wire_i64(apiObj.val3);
     wireObj.val4 = _api2wire_i64(apiObj.val4);
+    wireObj.watermark_bytes = _api2wire_uint_8_list(apiObj.watermarkBytes);
     wireObj.rgba = _api2wire_box_rgba(apiObj.rgba);
   }
 
@@ -338,6 +341,8 @@ class wire_PhotonFilter extends ffi.Struct {
 
   @ffi.Int64()
   external int val4;
+
+  external ffi.Pointer<wire_uint_8_list> watermark_bytes;
 
   external ffi.Pointer<wire_Rgba> rgba;
 }

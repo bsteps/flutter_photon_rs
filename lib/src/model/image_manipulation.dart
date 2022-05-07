@@ -45,7 +45,7 @@ Future<Uint8List> manipulateImage(ManipulationInput i) async {
     a: i,
   );
   if (kDebugMode && stopwatch != null) {
-    log("${stopwatch.elapsed.inMilliseconds}ms");
+    log("image_manipulation: ${stopwatch.elapsed.inMilliseconds}ms");
   }
   return value;
 }

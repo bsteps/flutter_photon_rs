@@ -1,7 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Transform;
+import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_manipulation/image_manipulation.dart';
 import 'package:image_manipulation_example/widgets/filter_list.dart';
@@ -76,12 +79,22 @@ const listedChannelFilters = [
   Channel.removeRedChannel(),
 ];
 
+List<Filter> listedWatermarkFilters(Uint8List bytes) {
+  return [
+    Watermark.bytes(
+      x: 20,
+      y: 20,
+      bytes: bytes,
+    )
+  ];
+}
+
 const listedTransformationFilters = [
   Transform.crop(
     x1: 20,
     y1: 20,
-    x2: 50,
-    y2: 50,
+    x2: 1000,
+    y2: 1000,
   ),
   Transform.flipH(),
   Transform.flipV(),
@@ -91,19 +104,19 @@ const listedTransformationFilters = [
   ),
   Transform.paddingTop(
     color: Colors.blue,
-    padding: 20,
+    padding: 50,
   ),
   Transform.paddingRight(
     color: Colors.blue,
-    padding: 20,
+    padding: 50,
   ),
   Transform.paddingLeft(
     color: Colors.blue,
-    padding: 20,
+    padding: 50,
   ),
   Transform.paddingUniform(
     color: Colors.blue,
-    padding: 20,
+    padding: 50,
   ),
   Transform.resize(
     height: 300,
@@ -166,6 +179,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Builder(builder: (context) {
           return ListView(
+            cacheExtent: 999999,
             children: [
               ValueListenableBuilder<Uint8List?>(
                 valueListenable: originalImage,
@@ -173,14 +187,11 @@ class _MyAppState extends State<MyApp> {
                   return ValueListenableBuilder<Set<Filter>>(
                     valueListenable: filters,
                     builder: (context, filters, child) {
-                      log(filters.toString());
-
                       if (value == null || filters.isNotEmpty) {
                         return Container();
                       }
 
                       if (filters.isEmpty) {
-                        log("Here");
                         return ImageMemoryWithLoading(
                           image: value,
                           width: MediaQuery.of(context).size.width,
@@ -198,6 +209,7 @@ class _MyAppState extends State<MyApp> {
                   if (originalImage.value == null || filters.value.isEmpty) {
                     return Container();
                   }
+                  Stopwatch? stopwatch;
 
                   return FutureBuilder<Uint8List>(
                     future: ImageManipulation.manipulate(
@@ -206,11 +218,18 @@ class _MyAppState extends State<MyApp> {
                       outputFormat: OutputFormat.Jpeg,
                     ),
                     builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.none) {
+                        stopwatch = Stopwatch()..start();
+                      } else if (snapshot.connectionState == ConnectionState.waiting) {
+                        stopwatch ??= Stopwatch()..start();
+                      } else if (snapshot.connectionState == ConnectionState.done) {
+                        stopwatch?.stop();
+                      }
                       processedImage = snapshot.data;
-
                       return ImageMemoryWithLoading(
                         image: snapshot.data == null ? originalImage.value! : snapshot.data!,
                         width: MediaQuery.of(context).size.width,
+                        timeInMs: stopwatch?.elapsedMilliseconds,
                       );
                     },
                   );
@@ -396,6 +415,59 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               ),
+              SizedBox(
+                height: 70,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ValueListenableBuilder<Uint8List?>(
+                      valueListenable: originalImage,
+                      builder: (context, value, child) {
+                        if (value == null) return Container();
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          child: Text(
+                            'Watermark',
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Expanded(
+                      child: FutureBuilder<ByteData>(
+                        future: rootBundle.load('images/watermark.png'),
+                        builder: (context, snapshot) {
+                          if (snapshot.data == null) {
+                            return Container();
+                          }
+                          return FilterList(
+                            filters: filters,
+                            listedFilters: listedWatermarkFilters(
+                              Uint8List.view(
+                                snapshot.data!.buffer,
+                                snapshot.data!.offsetInBytes,
+                                snapshot.data!.lengthInBytes,
+                              ),
+                            ),
+                            originalImage: originalImage,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 50,
+              )
             ],
           );
         }),

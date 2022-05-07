@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -10,17 +9,18 @@ class ImageMemoryWithLoading extends StatelessWidget {
   final double? height;
   final double? width;
   final BoxFit? fit;
+  final int? timeInMs;
   const ImageMemoryWithLoading({
     Key? key,
     required this.image,
     this.height,
     this.width,
     this.fit = BoxFit.cover,
+    this.timeInMs,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    log("rebuilded image");
     final imageWidget = Image.memory(
       image,
       height: height,
@@ -55,14 +55,33 @@ class ImageMemoryWithLoading extends StatelessWidget {
           future: completer.future,
           builder: (BuildContext context, AsyncSnapshot<ui.Image> snapshot) {
             if (snapshot.hasData) {
-              return Text(
-                '${snapshot.data?.width}x${snapshot.data?.height}',
+              return Container(
+                color: Colors.black,
+                child: Text(
+                  '${snapshot.data?.width}x${snapshot.data?.height}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               );
             } else {
               return const Text('Loading...');
             }
           },
         ),
+        if (timeInMs != null)
+          Positioned(
+            right: 0,
+            child: Container(
+              color: Colors.black,
+              child: Text(
+                "${timeInMs}ms",
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          )
       ],
     );
   }

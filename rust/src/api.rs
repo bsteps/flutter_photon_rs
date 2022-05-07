@@ -20,7 +20,7 @@ use photon_rs::{
         crop, fliph, flipv, padding_bottom, padding_left, padding_right, padding_top,
         padding_uniform, resize, SamplingFilter,
     },
-    PhotonImage,
+    PhotonImage, multiple::watermark,
 };
 
 pub use photon_rs::Rgba as PhotonRgba;
@@ -39,6 +39,7 @@ pub struct PhotonFilter {
     pub val2: i64,
     pub val3: i64,
     pub val4: i64,
+    pub watermark_bytes: Vec<u8>,
     pub rgba: Box<Rgba>,
 }
 
@@ -177,6 +178,13 @@ impl PhotonFilter {
                     SamplingFilter::Nearest,
                 ),
             };
+        }
+
+        //watermark
+        if self.name == "watermark" {
+            let watermark_img = photon_rs::native::open_image_from_bytes(&(self.watermark_bytes)).expect("invalid image data");
+
+            watermark(img, &watermark_img, self.val1 as u32, self.val2 as u32);
         }
 
         let preset_filters = vec![

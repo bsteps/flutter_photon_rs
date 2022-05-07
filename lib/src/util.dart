@@ -1,6 +1,7 @@
 import 'dart:ffi' as ffi;
 
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:image_manipulation/src/bridge_generated.dart';
 
@@ -23,6 +24,7 @@ PhotonFilter toPhotonFilterHelper({
   int value2 = 1,
   int value3 = 1,
   int value4 = 1,
+  Uint8List? watermarkBytes,
   Rgba? rgba,
 }) {
   return PhotonFilter(
@@ -31,6 +33,7 @@ PhotonFilter toPhotonFilterHelper({
     val2: value2,
     val3: value3,
     val4: value4,
+    watermarkBytes: watermarkBytes ?? Uint8List(0),
     rgba: rgba ??
         Rgba(
           r: 0,
