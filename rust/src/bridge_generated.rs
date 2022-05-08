@@ -58,7 +58,7 @@ pub struct wire_PhotonFilter {
     val2: i64,
     val3: i64,
     val4: i64,
-    watermark_bytes: *mut wire_uint_8_list,
+    image2_bytes: *mut wire_uint_8_list,
     rgba: *mut wire_Rgba,
 }
 
@@ -198,7 +198,7 @@ impl Wire2Api<PhotonFilter> for wire_PhotonFilter {
             val2: self.val2.wire2api(),
             val3: self.val3.wire2api(),
             val4: self.val4.wire2api(),
-            watermark_bytes: self.watermark_bytes.wire2api(),
+            image2_bytes: self.image2_bytes.wire2api(),
             rgba: self.rgba.wire2api(),
         }
     }
@@ -261,7 +261,7 @@ impl NewWithNullPtr for wire_PhotonFilter {
             val2: Default::default(),
             val3: Default::default(),
             val4: Default::default(),
-            watermark_bytes: core::ptr::null_mut(),
+            image2_bytes: core::ptr::null_mut(),
             rgba: core::ptr::null_mut(),
         }
     }

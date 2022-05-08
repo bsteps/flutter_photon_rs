@@ -16,11 +16,13 @@ use photon_rs::{
         decompose_max, decompose_min, grayscale, grayscale_human_corrected, grayscale_shades,
         sepia, single_channel_grayscale, threshold,
     },
+    multiple::{apply_gradient, blend, replace_background, watermark},
+    native::open_image_from_bytes,
     transform::{
         crop, fliph, flipv, padding_bottom, padding_left, padding_right, padding_top,
         padding_uniform, resize, SamplingFilter,
     },
-    PhotonImage, multiple::watermark,
+    PhotonImage, Rgb,
 };
 
 pub use photon_rs::Rgba as PhotonRgba;
@@ -39,7 +41,7 @@ pub struct PhotonFilter {
     pub val2: i64,
     pub val3: i64,
     pub val4: i64,
-    pub watermark_bytes: Vec<u8>,
+    pub image2_bytes: Vec<u8>,
     pub rgba: Box<Rgba>,
 }
 
@@ -180,11 +182,28 @@ impl PhotonFilter {
             };
         }
 
+        // Multiple
         //watermark
         if self.name == "watermark" {
-            let watermark_img = photon_rs::native::open_image_from_bytes(&(self.watermark_bytes)).expect("invalid image data");
+            let watermark_img =
+                open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
 
             watermark(img, &watermark_img, self.val1 as u32, self.val2 as u32);
+        }
+        if self.name == "apply_gradient" {
+            apply_gradient(img);
+        }
+        if self.name == "replace_background" {
+            let background_img =
+                open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
+            let rgb = Rgb::new(self.rgba.r, self.rgba.g, self.rgba.b);
+            replace_background(img, &background_img, rgb);
+        }
+        if self.name.contains("blend_") {
+            let image2_img =
+                open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
+            let blend_mode = self.name.replace("blend_", "");
+            blend(img, &image2_img, &blend_mode);
         }
 
         let preset_filters = vec![
@@ -236,7 +255,8 @@ pub enum OutputFormat {
 
 impl self::ManipulationInput {
     pub fn save(&self) -> Result<ZeroCopyBuffer<Vec<u8>>> {
-        let mut img = photon_rs::native::open_image_from_bytes(&(self.original_bytes))?;
+        let mut img =
+            open_image_from_bytes(&(self.original_bytes)).expect("Error getting image from bytes");
 
         for filter in self.filters.iter() {
             img = filter.apply(img);
@@ -244,8 +264,8 @@ impl self::ManipulationInput {
 
         let raw_pixels = img.get_raw_pixels();
         let _len = raw_pixels.len();
-        let img_buffer =
-            ImageBuffer::from_vec(img.get_width(), img.get_height(), raw_pixels).unwrap();
+        let img_buffer = ImageBuffer::from_vec(img.get_width(), img.get_height(), raw_pixels)
+            .expect("Error getting image buffer");
         let img = ImageRgba8(img_buffer);
 
         let format = match self.output_format {
@@ -285,5 +305,35 @@ pub fn manipulate_image(a: ManipulationInput) -> Result<ZeroCopyBuffer<Vec<u8>>>
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
+
+    #[test]
+    fn test_features() {
+        let buffer = std::fs::read("asset/image.jpg").expect("File Should Open");
+        let buffer2 = std::fs::read("asset/other.jpg").expect("File Should Open");
+        let buffer = manipulate_image(ManipulationInput {
+            original_bytes: buffer2,
+            // filters: vec![],
+            filters: vec![PhotonFilter {
+                name: String::from("replace_background"),
+                val1: 2000,
+                val2: 3000,
+                val3: 1,
+                image2_bytes: buffer,
+                rgba: Box::new(Rgba {
+                    r: 29,
+                    g: 45,
+                    b: 61,
+                    a: 255,
+                }),
+                val4: 1,
+            }],
+            output_format: OutputFormat::Jpeg,
+            quality: 100,
+        })
+        .expect("File Should Open")
+        .0;
+
+        std::fs::write("asset/image_manipulated.jpg", &buffer).expect("File Should be saved");
+    }
 }

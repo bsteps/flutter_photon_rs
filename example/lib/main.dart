@@ -1,15 +1,14 @@
 import 'dart:developer';
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Transform;
 import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:image_manipulation/image_manipulation.dart';
 import 'package:image_manipulation_example/widgets/filter_list.dart';
 import 'package:image_manipulation_example/widgets/image_memory_with_loading.dart';
-import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -79,13 +78,42 @@ const listedChannelFilters = [
   Channel.removeRedChannel(),
 ];
 
-List<Filter> listedWatermarkFilters(Uint8List bytes) {
+Future<List<Filter>> listedMultipleFilters() async {
+  final watermark = await rootBundle.load('images/watermark.png');
+  final blendImage = await rootBundle.load('images/blend.jpg');
   return [
-    Watermark.bytes(
+    Multiple.watermarkFromBytes(
       x: 20,
       y: 20,
-      bytes: bytes,
-    )
+      bytes: Uint8List.view(
+        watermark.buffer,
+        watermark.offsetInBytes,
+        watermark.lengthInBytes,
+      ),
+    ),
+    const Multiple.applyGradient(),
+    Multiple.replaceBackground(
+      bytes: Uint8List.view(
+        blendImage.buffer,
+        blendImage.offsetInBytes,
+        blendImage.lengthInBytes,
+      ),
+      rgb: const Rgb(
+        r: 159,
+        g: 122,
+        b: 94,
+      ),
+    ),
+    ...BlendMode.values.map((e) {
+      return Multiple.blend(
+        bytes: Uint8List.view(
+          blendImage.buffer,
+          blendImage.offsetInBytes,
+          blendImage.lengthInBytes,
+        ),
+        blendMode: e,
+      );
+    }).toList(),
   ];
 }
 
@@ -433,7 +461,7 @@ class _MyAppState extends State<MyApp> {
                             horizontal: 8,
                           ),
                           child: Text(
-                            'Watermark',
+                            'Multiple',
                           ),
                         );
                       },
@@ -442,21 +470,15 @@ class _MyAppState extends State<MyApp> {
                       height: 8,
                     ),
                     Expanded(
-                      child: FutureBuilder<ByteData>(
-                        future: rootBundle.load('images/watermark.png'),
+                      child: FutureBuilder<List<Filter>>(
+                        future: listedMultipleFilters(),
                         builder: (context, snapshot) {
                           if (snapshot.data == null) {
                             return Container();
                           }
                           return FilterList(
                             filters: filters,
-                            listedFilters: listedWatermarkFilters(
-                              Uint8List.view(
-                                snapshot.data!.buffer,
-                                snapshot.data!.offsetInBytes,
-                                snapshot.data!.lengthInBytes,
-                              ),
-                            ),
+                            listedFilters: snapshot.data ?? [],
                             originalImage: originalImage,
                           );
                         },
