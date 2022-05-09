@@ -24,6 +24,8 @@ class ImageManipulation {
     assert(
         outputFormat != OutputFormat.Jpeg || (quality >= 0 && quality <= 100), "quality should be between 0 and 100");
 
+    log(filters.toString());
+
     return compute(
       manipulateImage,
       ManipulationInput(

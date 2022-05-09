@@ -105,7 +105,11 @@ class __$RgbCopyWithImpl<$Res> extends _$RgbCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Rgb extends _Rgb {
-  const _$_Rgb({required this.r, required this.g, required this.b}) : super._();
+  const _$_Rgb({required this.r, required this.g, required this.b})
+      : assert(r <= 255 && r >= 0),
+        assert(g <= 255 && g >= 0),
+        assert(b <= 255 && b >= 0),
+        super._();
 
   @override
   final int r;

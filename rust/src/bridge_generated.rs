@@ -60,6 +60,7 @@ pub struct wire_PhotonFilter {
     val4: i64,
     image2_bytes: *mut wire_uint_8_list,
     rgba: *mut wire_Rgba,
+    val1f: f64,
 }
 
 #[repr(C)]
@@ -152,6 +153,12 @@ impl Wire2Api<Box<Rgba>> for *mut wire_Rgba {
     }
 }
 
+impl Wire2Api<f64> for f64 {
+    fn wire2api(self) -> f64 {
+        self
+    }
+}
+
 impl Wire2Api<i64> for i64 {
     fn wire2api(self) -> i64 {
         self
@@ -200,6 +207,7 @@ impl Wire2Api<PhotonFilter> for wire_PhotonFilter {
             val4: self.val4.wire2api(),
             image2_bytes: self.image2_bytes.wire2api(),
             rgba: self.rgba.wire2api(),
+            val1f: self.val1f.wire2api(),
         }
     }
 }
@@ -263,6 +271,7 @@ impl NewWithNullPtr for wire_PhotonFilter {
             val4: Default::default(),
             image2_bytes: core::ptr::null_mut(),
             rgba: core::ptr::null_mut(),
+            val1f: Default::default(),
         }
     }
 }

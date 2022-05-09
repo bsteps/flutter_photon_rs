@@ -22,6 +22,7 @@ typedef struct wire_PhotonFilter {
   int64_t val4;
   struct wire_uint_8_list *image2_bytes;
   struct wire_Rgba *rgba;
+  double val1f;
 } wire_PhotonFilter;
 
 typedef struct wire_list_photon_filter {

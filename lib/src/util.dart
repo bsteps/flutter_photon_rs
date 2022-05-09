@@ -24,6 +24,7 @@ PhotonFilter toPhotonFilterHelper({
   int value2 = 1,
   int value3 = 1,
   int value4 = 1,
+  double value1Double = 0,
   Uint8List? image2Bytes,
   Rgba? rgba,
 }) {
@@ -33,6 +34,7 @@ PhotonFilter toPhotonFilterHelper({
     val2: value2,
     val3: value3,
     val4: value4,
+    val1F: value1Double,
     image2Bytes: image2Bytes ?? Uint8List(0),
     rgba: rgba ??
         Rgba(

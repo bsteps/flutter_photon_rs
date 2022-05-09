@@ -44,6 +44,7 @@ class PhotonFilter {
   final int val4;
   final Uint8List image2Bytes;
   final Rgba rgba;
+  final double val1F;
 
   PhotonFilter({
     required this.name,
@@ -53,6 +54,7 @@ class PhotonFilter {
     required this.val4,
     required this.image2Bytes,
     required this.rgba,
+    required this.val1F,
   });
 }
 
@@ -107,6 +109,10 @@ class ImageManipulationImpl extends FlutterRustBridgeBase<ImageManipulationWire>
     final ptr = inner.new_box_rgba();
     _api_fill_to_wire_rgba(raw, ptr.ref);
     return ptr;
+  }
+
+  double _api2wire_f64(double raw) {
+    return raw;
   }
 
   int _api2wire_i64(int raw) {
@@ -164,6 +170,7 @@ class ImageManipulationImpl extends FlutterRustBridgeBase<ImageManipulationWire>
     wireObj.val4 = _api2wire_i64(apiObj.val4);
     wireObj.image2_bytes = _api2wire_uint_8_list(apiObj.image2Bytes);
     wireObj.rgba = _api2wire_box_rgba(apiObj.rgba);
+    wireObj.val1f = _api2wire_f64(apiObj.val1F);
   }
 
   void _api_fill_to_wire_rgba(Rgba apiObj, wire_Rgba wireObj) {
@@ -345,6 +352,9 @@ class wire_PhotonFilter extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> image2_bytes;
 
   external ffi.Pointer<wire_Rgba> rgba;
+
+  @ffi.Double()
+  external double val1f;
 }
 
 class wire_list_photon_filter extends ffi.Struct {

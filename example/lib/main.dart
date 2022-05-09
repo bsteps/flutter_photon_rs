@@ -78,6 +78,24 @@ const listedChannelFilters = [
   Channel.removeRedChannel(),
 ];
 
+const listedEffectFilters = [
+  Effect.adjustContrast(contrast: 100),
+  Effect.colorHorizontalStrips(length: 4, rgb: Rgb(r: 100, g: 100, b: 100)),
+  Effect.colorVerticalStrips(length: 4, rgb: Rgb(r: 100, g: 100, b: 100)),
+  Effect.colorize(),
+  Effect.frostedGlass(),
+  Effect.halftone(),
+  Effect.primary(),
+  Effect.solarize(),
+  Effect.incBrightness(brightness: 50),
+  Effect.multipleOffsets(offset: 20, channelIndex2: 2, channelIndex: 1),
+  Effect.offset(offset: 10, channelIndex: 0),
+  Effect.offset(offset: 10, channelIndex: 1),
+  Effect.offset(offset: 10, channelIndex: 2),
+  Effect.oil(intensity: 1, radius: 5),
+  Effect.tint(rOffset: 20, bOffset: 20, gOffset: 20),
+];
+
 Future<List<Filter>> listedMultipleFilters() async {
   final watermark = await rootBundle.load('images/watermark.png');
   final blendImage = await rootBundle.load('images/blend.jpg');
@@ -99,9 +117,9 @@ Future<List<Filter>> listedMultipleFilters() async {
         blendImage.lengthInBytes,
       ),
       rgb: const Rgb(
-        r: 159,
-        g: 122,
-        b: 94,
+        r: 1,
+        g: 255,
+        b: 19,
       ),
     ),
     ...BlendMode.values.map((e) {
@@ -254,10 +272,16 @@ class _MyAppState extends State<MyApp> {
                         stopwatch?.stop();
                       }
                       processedImage = snapshot.data;
-                      return ImageMemoryWithLoading(
-                        image: snapshot.data == null ? originalImage.value! : snapshot.data!,
-                        width: MediaQuery.of(context).size.width,
-                        timeInMs: stopwatch?.elapsedMilliseconds,
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          ImageMemoryWithLoading(
+                            image: snapshot.data == null ? originalImage.value! : snapshot.data!,
+                            width: MediaQuery.of(context).size.width,
+                            timeInMs: stopwatch?.elapsedMilliseconds,
+                          ),
+                          if (snapshot.data == null) const CircularProgressIndicator(),
+                        ],
                       );
                     },
                   );
@@ -487,8 +511,44 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               ),
+              SizedBox(
+                height: 70,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ValueListenableBuilder<Uint8List?>(
+                      valueListenable: originalImage,
+                      builder: (context, value, child) {
+                        if (value == null) return Container();
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          child: Text(
+                            'Effects',
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Expanded(
+                      child: FilterList(
+                        filters: filters,
+                        listedFilters: listedEffectFilters,
+                        originalImage: originalImage,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(
-                height: 50,
+                height: 100,
               )
             ],
           );

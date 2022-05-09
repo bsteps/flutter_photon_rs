@@ -22,7 +22,7 @@ use photon_rs::{
         crop, fliph, flipv, padding_bottom, padding_left, padding_right, padding_top,
         padding_uniform, resize, SamplingFilter,
     },
-    PhotonImage, Rgb,
+    PhotonImage, Rgb, effects::{adjust_contrast, color_horizontal_strips, color_vertical_strips, colorize, frosted_glass, halftone, horizontal_strips, multiple_offsets, offset, oil, primary, solarize, tint, vertical_strips, inc_brightness},
 };
 
 pub use photon_rs::Rgba as PhotonRgba;
@@ -43,6 +43,7 @@ pub struct PhotonFilter {
     pub val4: i64,
     pub image2_bytes: Vec<u8>,
     pub rgba: Box<Rgba>,
+    pub val1f: f64,
 }
 
 pub struct Rgba {
@@ -201,9 +202,60 @@ impl PhotonFilter {
         }
         if self.name.contains("blend_") {
             let image2_img =
-                open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
+            open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
             let blend_mode = self.name.replace("blend_", "");
             blend(img, &image2_img, &blend_mode);
+        }
+        
+        // Effects
+        if self.name == "adjust_contrast" {
+            adjust_contrast(img,self.val1f as f32);
+        }
+        if self.name == "color_horizontal_strips" {
+            let rgb = Rgb::new(self.rgba.r, self.rgba.g, self.rgba.b);
+
+            color_horizontal_strips(img,self.val1 as u8, rgb);
+        }
+        if self.name == "color_vertical_strips" {
+            let rgb = Rgb::new(self.rgba.r, self.rgba.g, self.rgba.b);
+
+            color_vertical_strips(img,self.val1 as u8, rgb);
+        }
+        if self.name == "colorize" {
+            colorize(img);
+        }
+        if self.name == "frosted_glass" {
+            frosted_glass(img);
+        }
+        if self.name == "halftone" {
+            halftone(img);
+        }
+        if self.name == "horizontal_strips" {
+            horizontal_strips(img, self.val1 as u8);
+        }
+        if self.name == "vertical_strips" {
+            vertical_strips(img, self.val1 as u8);
+        }
+        if self.name == "multiple_offsets" {
+            multiple_offsets(img, self.val1 as u32, self.val2 as usize, self.val3 as usize);
+        }
+        if self.name == "offset" {
+            offset(img, self.val1 as usize, self.val2 as u32);
+        }
+        if self.name == "oil" {
+            oil(img, self.val1 as i32, self.val1f);
+        }
+        if self.name == "primary" {
+            primary(img);
+        }
+        if self.name == "solarize" {
+            solarize(img);
+        }
+        if self.name == "tint" {
+            tint(img, self.val1 as u32, self.val2 as u32, self.val3 as u32);
+        }
+        if self.name == "inc_brightness" {
+            inc_brightness(img, self.val1 as u8);
         }
 
         let preset_filters = vec![
@@ -315,8 +367,8 @@ mod tests {
             original_bytes: buffer2,
             // filters: vec![],
             filters: vec![PhotonFilter {
-                name: String::from("replace_background"),
-                val1: 2000,
+                name: String::from("inc_brightness"),
+                val1: 100,
                 val2: 3000,
                 val3: 1,
                 image2_bytes: buffer,
@@ -327,6 +379,7 @@ mod tests {
                     a: 255,
                 }),
                 val4: 1,
+                val1f: 0.0,
             }],
             output_format: OutputFormat::Jpeg,
             quality: 100,

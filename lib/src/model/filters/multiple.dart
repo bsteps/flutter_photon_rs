@@ -12,6 +12,9 @@ part 'multiple.freezed.dart';
 class Rgb with _$Rgb {
   const Rgb._();
 
+  @Assert("r <= 255 && r >= 0")
+  @Assert("g <= 255 && g >= 0")
+  @Assert("b <= 255 && b >= 0")
   const factory Rgb({
     required int r,
     required int g,
