@@ -1,28 +1,14 @@
 extern crate photon_rs;
 
-use std::io::Cursor;
+use std::io::{Cursor, Write};
 
 use anyhow::Result;
 use flutter_rust_bridge::ZeroCopyBuffer;
 use image::{DynamicImage::ImageRgba8, ImageBuffer, ImageOutputFormat};
-// use img_parts::DynImage;
-// use img_parts::{DynImage, ImageEXIF, ImageICC};
+use img_parts::{DynImage, ImageEXIF, ImageICC};
 use photon_rs::{
-    channels::{
-        alter_channel, remove_blue_channel, remove_green_channel, remove_red_channel, swap_channels,
-    },
-    filters::filter,
-    monochrome::{
-        decompose_max, decompose_min, grayscale, grayscale_human_corrected, grayscale_shades,
-        sepia, single_channel_grayscale, threshold,
-    },
-    multiple::{apply_gradient, blend, replace_background, watermark},
-    native::open_image_from_bytes,
-    transform::{
-        crop, fliph, flipv, padding_bottom, padding_left, padding_right, padding_top,
-        padding_uniform, resize, SamplingFilter,
-    },
-    PhotonImage, Rgb, effects::{adjust_contrast, color_horizontal_strips, color_vertical_strips, colorize, frosted_glass, halftone, horizontal_strips, multiple_offsets, offset, oil, primary, solarize, tint, vertical_strips, inc_brightness},
+    channels, colour_spaces, conv, effects, filters::filter, monochrome, multiple,
+    native::open_image_from_bytes, transform, PhotonImage, Rgb,
 };
 
 pub use photon_rs::Rgba as PhotonRgba;
@@ -62,58 +48,59 @@ impl Rgba {
 impl PhotonFilter {
     pub fn apply(&self, mut img1: PhotonImage) -> PhotonImage {
         let img = &mut img1;
+
+        // Monochrome
         if self.name == "grayscale" {
-            grayscale(img);
+            monochrome::grayscale(img);
         }
         if self.name == "threshold" {
-            threshold(img, self.val1 as u32);
+            monochrome::threshold(img, self.val1 as u32);
         }
         if self.name == "grayscale_human_correction" {
-            grayscale_human_corrected(img);
+            monochrome::grayscale_human_corrected(img);
         }
         if self.name == "decompose_min" {
-            decompose_min(img);
+            monochrome::decompose_min(img);
         }
         if self.name == "decompose_max" {
-            decompose_max(img);
+            monochrome::decompose_max(img);
         }
         if self.name == "sepia" {
-            sepia(img);
+            monochrome::sepia(img);
         }
         if self.name == "grayscale_shades" {
-            grayscale_shades(img, self.val1 as u8);
+            monochrome::grayscale_shades(img, self.val1 as u8);
         }
         if self.name == "red_grayscale" {
-            single_channel_grayscale(img, 0);
+            monochrome::single_channel_grayscale(img, 0);
         }
         if self.name == "green_grayscale" {
-            single_channel_grayscale(img, 1);
+            monochrome::single_channel_grayscale(img, 1);
         }
         if self.name == "blue_grayscale" {
-            single_channel_grayscale(img, 2);
+            monochrome::single_channel_grayscale(img, 2);
         }
 
+        // Channels
         if self.name == "alter_channel" {
-            alter_channel(img, self.val1 as usize, self.val2 as i16);
+            channels::alter_channel(img, self.val1 as usize, self.val2 as i16);
         }
-
         if self.name == "swap_channels" {
-            swap_channels(img, self.val1 as usize, self.val2 as usize);
+            channels::swap_channels(img, self.val1 as usize, self.val2 as usize);
         }
-
         if self.name == "remove_red_channel" {
-            remove_red_channel(img, self.val1 as u8);
+            channels::remove_red_channel(img, self.val1 as u8);
         }
         if self.name == "remove_blue_channel" {
-            remove_blue_channel(img, self.val1 as u8);
+            channels::remove_blue_channel(img, self.val1 as u8);
         }
         if self.name == "remove_green_channel" {
-            remove_green_channel(img, self.val1 as u8);
+            channels::remove_green_channel(img, self.val1 as u8);
         }
 
         // Transfromation
         if self.name == "crop" {
-            return crop(
+            return transform::crop(
                 img,
                 self.val1 as u32,
                 self.val2 as u32,
@@ -122,142 +109,218 @@ impl PhotonFilter {
             );
         }
         if self.name == "fliph" {
-            fliph(img);
+            transform::fliph(img);
         }
         if self.name == "flipv" {
-            flipv(img);
+            transform::flipv(img);
         }
         if self.name == "padding_bottom" {
-            return padding_bottom(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return transform::padding_bottom(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "padding_left" {
-            return padding_left(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return transform::padding_left(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "padding_right" {
-            return padding_right(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return transform::padding_right(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "padding_top" {
-            return padding_top(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return transform::padding_top(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "padding_uniform" {
-            return padding_uniform(img, self.val1 as u32, self.rgba.to_photon_rgba());
+            return transform::padding_uniform(img, self.val1 as u32, self.rgba.to_photon_rgba());
         }
         if self.name == "resize" {
             return match self.val3 {
-                1 => resize(
+                1 => transform::resize(
                     img,
                     self.val1 as u32,
                     self.val2 as u32,
-                    SamplingFilter::Nearest,
+                    transform::SamplingFilter::Nearest,
                 ),
-                2 => resize(
+                2 => transform::resize(
                     img,
                     self.val1 as u32,
                     self.val2 as u32,
-                    SamplingFilter::Triangle,
+                    transform::SamplingFilter::Triangle,
                 ),
-                3 => resize(
+                3 => transform::resize(
                     img,
                     self.val1 as u32,
                     self.val2 as u32,
-                    SamplingFilter::CatmullRom,
+                    transform::SamplingFilter::CatmullRom,
                 ),
-                4 => resize(
+                4 => transform::resize(
                     img,
                     self.val1 as u32,
                     self.val2 as u32,
-                    SamplingFilter::Gaussian,
+                    transform::SamplingFilter::Gaussian,
                 ),
-                5 => resize(
+                5 => transform::resize(
                     img,
                     self.val1 as u32,
                     self.val2 as u32,
-                    SamplingFilter::Lanczos3,
+                    transform::SamplingFilter::Lanczos3,
                 ),
-                _ => resize(
+                _ => transform::resize(
                     img,
                     self.val1 as u32,
                     self.val2 as u32,
-                    SamplingFilter::Nearest,
+                    transform::SamplingFilter::Nearest,
                 ),
             };
         }
 
         // Multiple
-        //watermark
         if self.name == "watermark" {
             let watermark_img =
                 open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
 
-            watermark(img, &watermark_img, self.val1 as u32, self.val2 as u32);
+            multiple::watermark(img, &watermark_img, self.val1 as u32, self.val2 as u32);
         }
         if self.name == "apply_gradient" {
-            apply_gradient(img);
+            multiple::apply_gradient(img);
         }
         if self.name == "replace_background" {
             let background_img =
                 open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
             let rgb = Rgb::new(self.rgba.r, self.rgba.g, self.rgba.b);
-            replace_background(img, &background_img, rgb);
+            multiple::replace_background(img, &background_img, rgb);
         }
         if self.name.contains("blend_") {
             let image2_img =
-            open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
+                open_image_from_bytes(&(self.image2_bytes)).expect("invalid image data");
             let blend_mode = self.name.replace("blend_", "");
-            blend(img, &image2_img, &blend_mode);
+            multiple::blend(img, &image2_img, &blend_mode);
         }
-        
         // Effects
         if self.name == "adjust_contrast" {
-            adjust_contrast(img,self.val1f as f32);
+            effects::adjust_contrast(img, self.val1f as f32);
         }
         if self.name == "color_horizontal_strips" {
             let rgb = Rgb::new(self.rgba.r, self.rgba.g, self.rgba.b);
 
-            color_horizontal_strips(img,self.val1 as u8, rgb);
+            effects::color_horizontal_strips(img, self.val1 as u8, rgb);
         }
         if self.name == "color_vertical_strips" {
             let rgb = Rgb::new(self.rgba.r, self.rgba.g, self.rgba.b);
 
-            color_vertical_strips(img,self.val1 as u8, rgb);
+            effects::color_vertical_strips(img, self.val1 as u8, rgb);
         }
         if self.name == "colorize" {
-            colorize(img);
+            effects::colorize(img);
         }
         if self.name == "frosted_glass" {
-            frosted_glass(img);
+            effects::frosted_glass(img);
         }
         if self.name == "halftone" {
-            halftone(img);
+            effects::halftone(img);
         }
         if self.name == "horizontal_strips" {
-            horizontal_strips(img, self.val1 as u8);
+            effects::horizontal_strips(img, self.val1 as u8);
         }
         if self.name == "vertical_strips" {
-            vertical_strips(img, self.val1 as u8);
+            effects::vertical_strips(img, self.val1 as u8);
         }
         if self.name == "multiple_offsets" {
-            multiple_offsets(img, self.val1 as u32, self.val2 as usize, self.val3 as usize);
+            effects::multiple_offsets(
+                img,
+                self.val1 as u32,
+                self.val2 as usize,
+                self.val3 as usize,
+            );
         }
         if self.name == "offset" {
-            offset(img, self.val1 as usize, self.val2 as u32);
+            effects::offset(img, self.val1 as usize, self.val2 as u32);
         }
         if self.name == "oil" {
-            oil(img, self.val1 as i32, self.val1f);
+            effects::oil(img, self.val1 as i32, self.val1f);
         }
         if self.name == "primary" {
-            primary(img);
+            effects::primary(img);
         }
         if self.name == "solarize" {
-            solarize(img);
+            effects::solarize(img);
         }
         if self.name == "tint" {
-            tint(img, self.val1 as u32, self.val2 as u32, self.val3 as u32);
+            effects::tint(img, self.val1 as u32, self.val2 as u32, self.val3 as u32);
         }
         if self.name == "inc_brightness" {
-            inc_brightness(img, self.val1 as u8);
+            effects::inc_brightness(img, self.val1 as u8);
         }
 
+        // Color Spaces
+        if self.name.contains("hsl_") {
+            let mode = self.name.replace("hsl_", "");
+
+            colour_spaces::hsl(img, &mode, self.val1f as f32);
+        }
+        if self.name.contains("hsv_") {
+            let mode = self.name.replace("hsv_", "");
+
+            colour_spaces::hsv(img, &mode, self.val1f as f32);
+        }
+        if self.name.contains("lch_") {
+            let mode = self.name.replace("lch_", "");
+
+            colour_spaces::lch(img, &mode, self.val1f as f32);
+        }
+        if self.name == "mix_with_colour" {
+            let rgb = Rgb::new(self.rgba.r, self.rgba.g, self.rgba.b);
+
+            colour_spaces::mix_with_colour(img, rgb, self.val1f as f32);
+        }
+
+        // Conv
+        if self.name == "box_blur" {
+            conv::box_blur(img);
+        }
+        if self.name == "detect_45_deg_lines" {
+            conv::detect_45_deg_lines(img);
+        }
+        if self.name == "detect_135_deg_lines" {
+            conv::detect_135_deg_lines(img);
+        }
+        if self.name == "detect_horizontal_lines" {
+            conv::detect_horizontal_lines(img);
+        }
+        if self.name == "detect_vertical_lines" {
+            conv::detect_vertical_lines(img);
+        }
+        if self.name == "edge_detection" {
+            conv::edge_detection(img);
+        }
+        if self.name == "edge_one" {
+            conv::edge_one(img);
+        }
+        if self.name == "emboss" {
+            conv::emboss(img);
+        }
+        if self.name == "identity" {
+            conv::identity(img);
+        }
+        if self.name == "laplace" {
+            conv::laplace(img);
+        }
+        if self.name == "noise_reduction" {
+            conv::noise_reduction(img);
+        }
+        if self.name == "prewitt_horizontal" {
+            conv::prewitt_horizontal(img);
+        }
+        if self.name == "sharpen" {
+            conv::sharpen(img);
+        }
+        if self.name == "sobel_horizontal" {
+            conv::sobel_horizontal(img);
+        }
+        if self.name == "sobel_vertical" {
+            conv::sobel_vertical(img);
+        }
+        if self.name == "gaussian_blur" {
+            conv::gaussian_blur(img, self.val1 as i32);
+        }
+
+        // Preset Filters
         let preset_filters = vec![
             "oceanic",
             "islands",
@@ -327,25 +390,31 @@ impl self::ManipulationInput {
         };
         let mut bytes = Vec::with_capacity(_len);
 
-        // let (iccp, exif) = DynImage::from_bytes(self.original_bytes.clone().into())
-        //     .expect("image loaded")
-        //     .map_or((None, None), |dimg| (dimg.icc_profile(), dimg.exif()));
+        let (iccp, exif) = DynImage::from_bytes(self.original_bytes.clone().into())
+            .expect("image loaded")
+            .map_or((None, None), |dimg| (dimg.icc_profile(), dimg.exif()));
 
-        // img.write_to(&mut Cursor::new(&mut bytes), format).expect("Error Writing To Buffer");
-        img.write_to(&mut Cursor::new(&mut bytes), format)
-            .expect("Error Writing To Buffer");
-        // if iccp.is_some() || exif.is_some() {
-        //     match DynImage::from_bytes(bytes.clone().into()).expect("image loaded") {
-        //         Some(mut dimg) => {
-        //             dimg.set_icc_profile(iccp);
-        //             dimg.set_exif(exif);
-        //             dimg.encoder()
-        //                 .write_to(&mut bytes)
-        //                 .expect("Error Writing To Buffer");
-        //         }
-        //         None => {}
-        //     };
-        // }
+        if iccp.is_some() || exif.is_some() {
+            let mut out = vec![];
+            img.write_to(&mut Cursor::new(&mut out), format)
+                .expect("Error Writing To Buffer");
+
+            match DynImage::from_bytes(out.clone().into()).expect("image loaded") {
+                Some(mut dimg) => {
+                    dimg.set_icc_profile(iccp);
+                    dimg.set_exif(exif);
+                    dimg.encoder()
+                        .write_to(&mut bytes)
+                        .expect("Error Writing To Buffer");
+                }
+                None => {
+                    bytes.write_all(&out).expect("output file written");
+                }
+            };
+        } else {
+            img.write_to(&mut Cursor::new(&mut bytes), format)
+                .expect("Error Writing To Buffer");
+        }
 
         Ok(ZeroCopyBuffer(bytes))
     }

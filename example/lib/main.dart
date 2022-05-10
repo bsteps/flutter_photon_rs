@@ -78,6 +78,25 @@ const listedChannelFilters = [
   Channel.removeRedChannel(),
 ];
 
+const listedColourSpaceFilters = [
+  ColourSpace.hsl(level: 0.3, mode: ColourSpaceMode.darken),
+  ColourSpace.hsl(level: 0.3, mode: ColourSpaceMode.desaturate),
+  ColourSpace.hsl(level: 0.3, mode: ColourSpaceMode.lighten),
+  ColourSpace.hsl(level: 0.3, mode: ColourSpaceMode.saturate),
+  ColourSpace.hsl(level: 0.3, mode: ColourSpaceMode.shift_hue),
+  ColourSpace.hsv(level: 0.3, mode: ColourSpaceMode.darken),
+  ColourSpace.hsv(level: 0.3, mode: ColourSpaceMode.desaturate),
+  ColourSpace.hsv(level: 0.3, mode: ColourSpaceMode.lighten),
+  ColourSpace.hsv(level: 0.3, mode: ColourSpaceMode.saturate),
+  ColourSpace.hsv(level: 0.3, mode: ColourSpaceMode.shift_hue),
+  ColourSpace.lch(level: 0.3, mode: ColourSpaceMode.darken),
+  ColourSpace.lch(level: 0.3, mode: ColourSpaceMode.desaturate),
+  ColourSpace.lch(level: 0.3, mode: ColourSpaceMode.lighten),
+  ColourSpace.lch(level: 0.3, mode: ColourSpaceMode.saturate),
+  ColourSpace.lch(level: 0.3, mode: ColourSpaceMode.shift_hue),
+  ColourSpace.mixWithColour(opacity: .5, rgb: Rgb(r: 10, g: 20, b: 43)),
+];
+
 const listedEffectFilters = [
   Effect.adjustContrast(contrast: 100),
   Effect.colorHorizontalStrips(length: 4, rgb: Rgb(r: 100, g: 100, b: 100)),
@@ -94,6 +113,27 @@ const listedEffectFilters = [
   Effect.offset(offset: 10, channelIndex: 2),
   Effect.oil(intensity: 1, radius: 5),
   Effect.tint(rOffset: 20, bOffset: 20, gOffset: 20),
+];
+
+const listedConvolutionFilters = [
+  Convolution.boxBlur(),
+  Convolution.detect45DegLines(),
+  Convolution.detect135DegLines(),
+  Convolution.detectVerticalLines(),
+  Convolution.detectHorizontalLines(),
+  Convolution.edgeDetection(),
+  Convolution.edgeOne(),
+  Convolution.emboss(),
+  Convolution.identity(),
+  Convolution.laplace(),
+  Convolution.noiseReduction(),
+  Convolution.prewittHorizontal(),
+  Convolution.sharpen(),
+  Convolution.sobelHorizontal(),
+  Convolution.sobelVertical(),
+  Convolution.gaussianBlur(
+    radius: 20,
+  ),
 ];
 
 Future<List<Filter>> listedMultipleFilters() async {
@@ -212,10 +252,9 @@ class _MyAppState extends State<MyApp> {
               onPressed: () async {
                 if (processedImage == null) return;
 
-                final dynamic data = await ImageGallerySaver.saveImage(
+                final data = await ImageGallerySaver.saveImage(
                   processedImage!,
                 );
-                log(data.toString());
               },
               icon: const Icon(
                 Icons.download,
@@ -541,6 +580,78 @@ class _MyAppState extends State<MyApp> {
                       child: FilterList(
                         filters: filters,
                         listedFilters: listedEffectFilters,
+                        originalImage: originalImage,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 70,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ValueListenableBuilder<Uint8List?>(
+                      valueListenable: originalImage,
+                      builder: (context, value, child) {
+                        if (value == null) return Container();
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          child: Text(
+                            'Colour Spaces',
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Expanded(
+                      child: FilterList(
+                        filters: filters,
+                        listedFilters: listedColourSpaceFilters,
+                        originalImage: originalImage,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 70,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ValueListenableBuilder<Uint8List?>(
+                      valueListenable: originalImage,
+                      builder: (context, value, child) {
+                        if (value == null) return Container();
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          child: Text(
+                            'Convolution',
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Expanded(
+                      child: FilterList(
+                        filters: filters,
+                        listedFilters: listedConvolutionFilters,
                         originalImage: originalImage,
                       ),
                     ),

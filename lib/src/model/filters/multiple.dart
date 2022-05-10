@@ -98,7 +98,6 @@ class Multiple with _$Multiple, Filter {
         );
       },
       blend: (value) {
-        log(value.name);
         return toPhotonFilterHelper(
           name: value.name,
           image2Bytes: value.bytes,
