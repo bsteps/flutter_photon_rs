@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -8,6 +9,8 @@ class ImageMemoryWithLoading extends StatelessWidget {
   final Uint8List image;
   final double? height;
   final double? width;
+  final int? cacheHeight;
+  final int? cacheWidth;
   final BoxFit? fit;
   final int? timeInMs;
   const ImageMemoryWithLoading({
@@ -15,6 +18,8 @@ class ImageMemoryWithLoading extends StatelessWidget {
     required this.image,
     this.height,
     this.width,
+    this.cacheHeight,
+    this.cacheWidth,
     this.fit = BoxFit.cover,
     this.timeInMs,
   }) : super(key: key);
@@ -23,23 +28,28 @@ class ImageMemoryWithLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageWidget = Image.memory(
       image,
+      key: key,
       height: height,
       width: width,
+      cacheHeight: cacheHeight,
+      cacheWidth: cacheWidth,
       fit: fit,
-      frameBuilder: (context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-        if (wasSynchronouslyLoaded) return child;
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: frame != null
-              ? child
-              : Container(
-                  alignment: Alignment.center,
-                  height: height ?? width ?? 100,
-                  width: width ?? height ?? 100,
-                  child: const CircularProgressIndicator(),
-                ),
-        );
-      },
+      gaplessPlayback: true,
+      // frameBuilder: (context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+      //   if (wasSynchronouslyLoaded) return child;
+      //   log("frame: " + frame.toString());
+      //   return AnimatedSwitcher(
+      //     duration: const Duration(milliseconds: 200),
+      //     child: frame != null
+      //         ? child
+      //         : Container(
+      //             alignment: Alignment.center,
+      //             height: height ?? width ?? 100,
+      //             width: width ?? height ?? 100,
+      //             child: const CircularProgressIndicator(),
+      //           ),
+      //   );
+      // },
     );
 
     final completer = Completer<ui.Image>();
@@ -48,6 +58,7 @@ class ImageMemoryWithLoading extends StatelessWidget {
         completer.complete(image.image);
       },
     ));
+
     return Stack(
       children: [
         imageWidget,

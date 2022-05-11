@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Transform;
 import 'package:flutter/services.dart';
@@ -233,12 +234,22 @@ const listedTransformationFilters = [
 
 class _MyAppState extends State<MyApp> {
   ValueNotifier<Uint8List?> originalImage = ValueNotifier(null);
-  Uint8List? processedImage;
+  ValueNotifier<Uint8List?> resizedImage = ValueNotifier(null);
   ValueNotifier<Set<Filter>> filters = ValueNotifier({});
+  ValueNotifier<double> slider = ValueNotifier(0);
+  ValueNotifier<double> sliderDelyed = ValueNotifier(0);
 
   @override
   void initState() {
     super.initState();
+    slider.addListener(() async {
+      await Future.delayed(
+        const Duration(
+          milliseconds: 200,
+        ),
+      );
+      sliderDelyed.value = slider.value;
+    });
   }
 
   @override
@@ -250,11 +261,20 @@ class _MyAppState extends State<MyApp> {
           actions: [
             IconButton(
               onPressed: () async {
-                if (processedImage == null) return;
+                if (filters.value.isEmpty) return;
+                final stopwatch = Stopwatch()..start();
 
-                final data = await ImageGallerySaver.saveImage(
-                  processedImage!,
+                final bytes = await ImageManipulation.manipulate(
+                  bytes: originalImage.value!,
+                  filters: filters.value.toList(),
+                  outputFormat: OutputFormat.Jpeg,
                 );
+                final data = await ImageGallerySaver.saveImage(
+                  bytes,
+                );
+                log(stopwatch.elapsed.inMilliseconds.toString() + "ms");
+
+                log(data.toString());
               },
               icon: const Icon(
                 Icons.download,
@@ -267,62 +287,118 @@ class _MyAppState extends State<MyApp> {
             cacheExtent: 999999,
             children: [
               ValueListenableBuilder<Uint8List?>(
-                valueListenable: originalImage,
+                valueListenable: resizedImage,
                 builder: (context, value, child) {
-                  return ValueListenableBuilder<Set<Filter>>(
-                    valueListenable: filters,
-                    builder: (context, filters, child) {
-                      if (value == null || filters.isNotEmpty) {
-                        return Container();
-                      }
+                  return ValueListenableBuilder<double>(
+                    valueListenable: sliderDelyed,
+                    builder: (context, sliderValue, _) {
+                      return ValueListenableBuilder<Set<Filter>>(
+                        valueListenable: filters,
+                        builder: (context, filters, child) {
+                          if (value == null || filters.isNotEmpty || sliderValue != 0) {
+                            return Container();
+                          }
 
-                      if (filters.isEmpty) {
-                        return ImageMemoryWithLoading(
-                          image: value,
-                          width: MediaQuery.of(context).size.width,
-                        );
-                      }
+                          if (filters.isEmpty) {
+                            return ImageMemoryWithLoading(
+                              image: value,
+                              width: MediaQuery.of(context).size.width,
+                              // cacheWidth: MediaQuery.of(context).size.width.toInt() * window.devicePixelRatio.ceil(),
+                            );
+                          }
 
-                      return Container();
+                          return Container();
+                        },
+                      );
                     },
                   );
                 },
               ),
-              ValueListenableBuilder<Set<Filter>>(
-                valueListenable: filters,
-                builder: (context, value, child) {
-                  if (originalImage.value == null || filters.value.isEmpty) {
-                    return Container();
-                  }
-                  Stopwatch? stopwatch;
-
-                  return FutureBuilder<Uint8List>(
-                    future: ImageManipulation.manipulate(
-                      bytes: originalImage.value!,
-                      filters: value.toList(),
-                      outputFormat: OutputFormat.Jpeg,
-                    ),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.none) {
-                        stopwatch = Stopwatch()..start();
-                      } else if (snapshot.connectionState == ConnectionState.waiting) {
-                        stopwatch ??= Stopwatch()..start();
-                      } else if (snapshot.connectionState == ConnectionState.done) {
-                        stopwatch?.stop();
+              ValueListenableBuilder<double>(
+                valueListenable: sliderDelyed,
+                builder: (context, sliderValue, _) {
+                  return ValueListenableBuilder<Set<Filter>>(
+                    valueListenable: filters,
+                    builder: (context, value, child) {
+                      if (resizedImage.value == null || (filters.value.isEmpty && sliderValue == 0)) {
+                        return Container();
                       }
-                      processedImage = snapshot.data;
-                      return Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          ImageMemoryWithLoading(
-                            image: snapshot.data == null ? originalImage.value! : snapshot.data!,
-                            width: MediaQuery.of(context).size.width,
-                            timeInMs: stopwatch?.elapsedMilliseconds,
-                          ),
-                          if (snapshot.data == null) const CircularProgressIndicator(),
-                        ],
+                      Stopwatch stopwatch = Stopwatch();
+
+                      return FutureBuilder<Uint8List>(
+                        future: ImageManipulation.manipulate(
+                          bytes: resizedImage.value!,
+                          filters: [
+                            ...value.toList(),
+                            if (sliderValue != 0)
+                              Convolution.gaussianBlur(
+                                radius: (sliderValue * 10).toInt(),
+                              ),
+                          ],
+                          outputFormat: OutputFormat.Jpeg,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.none) {
+                            stopwatch.reset();
+                            stopwatch.start();
+                          } else if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (!stopwatch.isRunning) {
+                              stopwatch.reset();
+                              stopwatch.start();
+                            }
+                          } else if (snapshot.connectionState == ConnectionState.done) {
+                            stopwatch.stop();
+                          }
+
+                          return Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              LayoutBuilder(builder: (context, size) {
+                                return ImageMemoryWithLoading(
+                                  image: snapshot.data == null ? resizedImage.value! : snapshot.data!,
+                                  width: size.constrainWidth(),
+                                  // cacheWidth: size.constrainWidth().toInt() * window.devicePixelRatio.ceil(),
+                                  timeInMs: stopwatch.elapsed.inMilliseconds,
+                                );
+                              }),
+                              if (snapshot.data == null) const CircularProgressIndicator(),
+                            ],
+                          );
+                        },
                       );
                     },
+                  );
+                },
+              ),
+              ValueListenableBuilder<double>(
+                valueListenable: slider,
+                builder: (context, value, c) {
+                  if (resizedImage.value == null) {
+                    return Container();
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(
+                          left: 12,
+                          right: 12,
+                          top: 12,
+                        ),
+                        child: Text("Gaussian Blur"),
+                      ),
+                      Slider(
+                        value: value,
+                        min: 0,
+                        max: 1,
+                        onChanged: (value) {
+                          slider.value = value;
+                        },
+                        onChangeEnd: (value) {
+                          slider.value = value;
+                        },
+                      ),
+                    ],
                   );
                 },
               ),
@@ -664,22 +740,45 @@ class _MyAppState extends State<MyApp> {
             ],
           );
         }),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            final _picker = ImagePicker();
-            final image = await _picker.getImage(
-              source: ImageSource.gallery,
-            );
+        floatingActionButton: Builder(builder: (context) {
+          return FloatingActionButton(
+            onPressed: () async {
+              final _picker = ImagePicker();
+              final image = await _picker.getImage(
+                source: ImageSource.gallery,
+              );
 
-            if (image != null) {
-              final imageBytes = await image.readAsBytes();
-              originalImage.value = imageBytes;
-              setState(() {});
-              log(originalImage.value?.length.toString() ?? '');
-            }
-          },
-          child: const Icon(Icons.image),
-        ),
+              if (image != null) {
+                final imageBytes = await image.readAsBytes();
+                originalImage.value = imageBytes;
+
+                final stopwatch = Stopwatch()..start();
+                final codec = await instantiateImageCodec(
+                  imageBytes,
+                  targetWidth: MediaQuery.of(context).size.width.toInt() * window.devicePixelRatio.ceil(),
+                );
+                final frameInfo = await codec.getNextFrame();
+                final uiImage = frameInfo.image;
+                // ----------
+
+                // Convert to List<int>
+                // ----------
+                final resizedByteData = await uiImage.toByteData(
+                  format: ImageByteFormat.png,
+                ) as ByteData;
+                final resizedUint8List =
+                    resizedByteData.buffer.asUint8List(resizedByteData.offsetInBytes, resizedByteData.lengthInBytes);
+                resizedImage.value = resizedUint8List;
+                log("Resize Image: ${stopwatch.elapsedMilliseconds}ms");
+
+                setState(() {});
+                log(originalImage.value?.length.toString() ?? '');
+                log(resizedImage.value?.length.toString() ?? '');
+              }
+            },
+            child: const Icon(Icons.image),
+          );
+        }),
       ),
     );
   }

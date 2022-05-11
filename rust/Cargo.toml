@@ -12,6 +12,6 @@ crate-type = ["cdylib"]
 [dependencies]
 flutter_rust_bridge = "1"
 anyhow = { version = "1.0.56", features = ["backtrace"] }
-photon-rs = "0.3.1"
+photon-rs = { version = "^0.3.1", features = ["default", ] }
 image = "0.24.1"
 img-parts = "0.2.3"

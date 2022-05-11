@@ -4,11 +4,14 @@ use std::io::{Cursor, Write};
 
 use anyhow::Result;
 use flutter_rust_bridge::ZeroCopyBuffer;
-use image::{DynamicImage::ImageRgba8, ImageBuffer, ImageOutputFormat};
+use image::ImageOutputFormat;
 use img_parts::{DynImage, ImageEXIF, ImageICC};
 use photon_rs::{
-    channels, colour_spaces, conv, effects, filters::filter, monochrome, multiple,
-    native::open_image_from_bytes, transform, PhotonImage, Rgb,
+    channels, colour_spaces, conv, effects,
+    filters::filter,
+    monochrome, multiple,
+    native::{self, open_image_from_bytes},
+    transform, PhotonImage, Rgb,
 };
 
 pub use photon_rs::Rgba as PhotonRgba;
@@ -377,18 +380,18 @@ impl self::ManipulationInput {
             img = filter.apply(img);
         }
 
-        let raw_pixels = img.get_raw_pixels();
+        let width = img.get_width();
+        let height = img.get_height();
+        let raw_pixels = native::image_to_bytes(img);
         let _len = raw_pixels.len();
-        let img_buffer = ImageBuffer::from_vec(img.get_width(), img.get_height(), raw_pixels)
-            .expect("Error getting image buffer");
-        let img = ImageRgba8(img_buffer);
 
         let format = match self.output_format {
             OutputFormat::Png => ImageOutputFormat::Png,
             OutputFormat::Jpeg => ImageOutputFormat::Jpeg(100),
             OutputFormat::Gif => ImageOutputFormat::Gif,
         };
-        let mut bytes = Vec::with_capacity(_len);
+
+        let mut bytes = vec![];
 
         let (iccp, exif) = DynImage::from_bytes(self.original_bytes.clone().into())
             .expect("image loaded")
@@ -396,8 +399,15 @@ impl self::ManipulationInput {
 
         if iccp.is_some() || exif.is_some() {
             let mut out = vec![];
-            img.write_to(&mut Cursor::new(&mut out), format)
-                .expect("Error Writing To Buffer");
+            image::write_buffer_with_format(
+                &mut Cursor::new(&mut out),
+                &raw_pixels,
+                width,
+                height,
+                image::ColorType::Rgba8,
+                format,
+            )
+            .expect("error writing buff with format");
 
             match DynImage::from_bytes(out.clone().into()).expect("image loaded") {
                 Some(mut dimg) => {
@@ -412,8 +422,15 @@ impl self::ManipulationInput {
                 }
             };
         } else {
-            img.write_to(&mut Cursor::new(&mut bytes), format)
-                .expect("Error Writing To Buffer");
+            image::write_buffer_with_format(
+                &mut Cursor::new(&mut bytes),
+                &raw_pixels,
+                width,
+                height,
+                image::ColorType::Rgba8,
+                format,
+            )
+            .expect("error writing buff with format");
         }
 
         Ok(ZeroCopyBuffer(bytes))
@@ -426,21 +443,23 @@ pub fn manipulate_image(a: ManipulationInput) -> Result<ZeroCopyBuffer<Vec<u8>>>
 
 #[cfg(test)]
 mod tests {
+    use std::time::SystemTime;
+
     use super::*;
 
     #[test]
     fn test_features() {
         let buffer = std::fs::read("asset/image.jpg").expect("File Should Open");
-        let buffer2 = std::fs::read("asset/other.jpg").expect("File Should Open");
+        let start1 = SystemTime::now();
+
         let buffer = manipulate_image(ManipulationInput {
-            original_bytes: buffer2,
-            // filters: vec![],
+            original_bytes: buffer,
             filters: vec![PhotonFilter {
-                name: String::from("inc_brightness"),
+                name: String::from("grayscale"),
                 val1: 100,
                 val2: 3000,
                 val3: 1,
-                image2_bytes: buffer,
+                image2_bytes: vec![],
                 rgba: Box::new(Rgba {
                     r: 29,
                     g: 45,
@@ -457,5 +476,9 @@ mod tests {
         .0;
 
         std::fs::write("asset/image_manipulated.jpg", &buffer).expect("File Should be saved");
+
+        let end = SystemTime::now();
+        let duration = end.duration_since(start1).unwrap();
+        println!("it took {}ms", duration.as_millis());
     }
 }
