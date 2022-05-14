@@ -6,7 +6,7 @@ edition = "2021"
 [lib]
 name = "image_manipulation"
 # this is needed to build for iOS and Android.
-crate-type = ["cdylib"]
+crate-type = ["lib", "staticlib", "cdylib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
