@@ -7,7 +7,7 @@ packages:
       name: args
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.0"
+    version: "2.3.1"
   async:
     dependency: transitive
     description:
@@ -63,7 +63,7 @@ packages:
       name: cross_file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.2"
+    version: "0.3.3+1"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -84,7 +84,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.1"
   ffigen:
     dependency: transitive
     description:
@@ -111,20 +111,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  flutter_photon:
+    dependency: "direct main"
+    description:
+      path: ".."
+      relative: true
+    source: path
+    version: "0.0.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
       name: flutter_plugin_android_lifecycle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.5"
+    version: "2.0.6"
   flutter_rust_bridge:
     dependency: transitive
     description:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.27.2"
+    version: "1.31.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -141,7 +148,7 @@ packages:
       name: freezed_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.3"
   glob:
     dependency: transitive
     description:
@@ -162,7 +169,7 @@ packages:
       name: http_parser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   image_gallery_saver:
     dependency: "direct main"
     description:
@@ -170,34 +177,41 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.1"
-  image_manipulation:
-    dependency: "direct main"
-    description:
-      path: ".."
-      relative: true
-    source: path
-    version: "0.0.1"
   image_picker:
     dependency: "direct main"
     description:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.5+4"
+    version: "0.8.5+3"
+  image_picker_android:
+    dependency: transitive
+    description:
+      name: image_picker_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.4+13"
   image_picker_for_web:
     dependency: transitive
     description:
       name: image_picker_for_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.6"
+    version: "2.1.8"
+  image_picker_ios:
+    dependency: transitive
+    description:
+      name: image_picker_ios
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.5+5"
   image_picker_platform_interface:
     dependency: transitive
     description:
       name: image_picker_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.4.4"
+    version: "2.5.0"
   js:
     dependency: transitive
     description:
@@ -211,7 +225,7 @@ packages:
       name: json_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.4.0"
+    version: "4.5.0"
   lints:
     dependency: transitive
     description:
@@ -267,7 +281,7 @@ packages:
       name: quiver
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.1+1"
+    version: "3.1.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -335,7 +349,7 @@ packages:
       name: yaml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.1"
 sdks:
   dart: ">=2.16.2 <3.0.0"
-  flutter: ">=2.5.0"
+  flutter: ">=2.8.0"

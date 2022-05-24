@@ -14,30 +14,30 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		C1BEAC65282FE46400073EEA /* libimage_manipulation_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1BEAC60282FE3ED00073EEA /* libimage_manipulation_static.a */; };
+		C1BEAC65282FE46400073EEA /* libflutter_photon_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1BEAC60282FE3ED00073EEA /* libflutter_photon_static.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		C1BEAC5F282FE3ED00073EEA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C1BEAC5A282FE3ED00073EEA /* image_manipulation.xcodeproj */;
+			containerPortal = C1BEAC5A282FE3ED00073EEA /* flutter_photon.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = CA604D57EDA33F87F8A46CE2;
-			remoteInfo = "image_manipulation-staticlib";
+			remoteInfo = "flutter_photon-staticlib";
 		};
 		C1BEAC61282FE3ED00073EEA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C1BEAC5A282FE3ED00073EEA /* image_manipulation.xcodeproj */;
+			containerPortal = C1BEAC5A282FE3ED00073EEA /* flutter_photon.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = CA60753C662CEF1DBBC2F348;
-			remoteInfo = "image_manipulation-cdylib";
+			remoteInfo = "flutter_photon-cdylib";
 		};
 		C1BEAC63282FE43A00073EEA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C1BEAC5A282FE3ED00073EEA /* image_manipulation.xcodeproj */;
+			containerPortal = C1BEAC5A282FE3ED00073EEA /* flutter_photon.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = CA604D57EDA36E9749899E2A;
-			remoteInfo = "image_manipulation-staticlib";
+			remoteInfo = "flutter_photon-staticlib";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -72,7 +72,7 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C1BEAC5A282FE3ED00073EEA /* image_manipulation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = image_manipulation.xcodeproj; path = ../../../rust/image_manipulation.xcodeproj; sourceTree = "<group>"; };
+		C1BEAC5A282FE3ED00073EEA /* flutter_photon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = flutter_photon.xcodeproj; path = ../../../rust/flutter_photon.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,7 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C1BEAC65282FE46400073EEA /* libimage_manipulation_static.a in Frameworks */,
+				C1BEAC65282FE46400073EEA /* libflutter_photon_static.a in Frameworks */,
 				1412A38DEACB48BA44B307D6 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -139,7 +139,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
-				C1BEAC5A282FE3ED00073EEA /* image_manipulation.xcodeproj */,
+				C1BEAC5A282FE3ED00073EEA /* flutter_photon.xcodeproj */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -155,8 +155,8 @@
 		C1BEAC5B282FE3ED00073EEA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C1BEAC60282FE3ED00073EEA /* libimage_manipulation_static.a */,
-				C1BEAC62282FE3ED00073EEA /* image_manipulation.dylib */,
+				C1BEAC60282FE3ED00073EEA /* libflutter_photon_static.a */,
+				C1BEAC62282FE3ED00073EEA /* flutter_photon.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -216,7 +216,7 @@
 			projectReferences = (
 				{
 					ProductGroup = C1BEAC5B282FE3ED00073EEA /* Products */;
-					ProjectRef = C1BEAC5A282FE3ED00073EEA /* image_manipulation.xcodeproj */;
+					ProjectRef = C1BEAC5A282FE3ED00073EEA /* flutter_photon.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -227,17 +227,17 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		C1BEAC60282FE3ED00073EEA /* libimage_manipulation_static.a */ = {
+		C1BEAC60282FE3ED00073EEA /* libflutter_photon_static.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libimage_manipulation_static.a;
+			path = libflutter_photon_static.a;
 			remoteRef = C1BEAC5F282FE3ED00073EEA /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		C1BEAC62282FE3ED00073EEA /* image_manipulation.dylib */ = {
+		C1BEAC62282FE3ED00073EEA /* flutter_photon.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			path = image_manipulation.dylib;
+			path = flutter_photon.dylib;
 			remoteRef = C1BEAC61282FE3ED00073EEA /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -342,7 +342,7 @@
 /* Begin PBXTargetDependency section */
 		C1BEAC64282FE43A00073EEA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = "image_manipulation-staticlib";
+			name = "flutter_photon-staticlib";
 			targetProxy = C1BEAC63282FE43A00073EEA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -430,7 +430,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.bsteps.imagecompression.imageManipulationExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bstepsflutter_photon.flutterPhotonExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -558,7 +558,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.bsteps.imagecompression.imageManipulationExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bsteps.flutter_photon.flutterPhotonExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -580,7 +580,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.bsteps.imagecompression.imageManipulationExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bsteps.flutter_photon.flutterPhotonExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

@@ -1,4 +1,4 @@
-package com.bsteps.image_compression.image_manipulation_example;
+package com.bsteps.flutter_photon.flutter_photon_example;
 
 import io.flutter.embedding.android.FlutterActivity;
 

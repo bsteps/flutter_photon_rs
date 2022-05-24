@@ -49,14 +49,14 @@
             isa = PBXFileReference;
             explicitFileType = "archive.ar";
             includeInIndex = 0;
-            name = "libimage_manipulation_static.a";
+            name = "libflutter_photon_static.a";
             sourceTree = TARGET_BUILD_DIR;
         };
         CA60753C662CEF1DBBC2F348 /* cdylib */ = {
             isa = PBXFileReference;
             explicitFileType = "compiled.mach-o.dylib";
             includeInIndex = 0;
-            name = "image_manipulation.dylib";
+            name = "flutter_photon.dylib";
             sourceTree = TARGET_BUILD_DIR;
         };
                 CA60B963E0AE3EF4668187A5 /* Cargo.toml */ = {
@@ -121,7 +121,7 @@ CA60B963E0AE98AF0B5890DB,
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-        CA604D57EDA36E9749899E2A /* image_manipulation-staticlib */ = {
+        CA604D57EDA36E9749899E2A /* flutter_photon-staticlib */ = {
             isa = PBXNativeTarget;
             buildConfigurationList = CA60790EEFC56E9749899E2A;
             buildPhases = (
@@ -133,12 +133,12 @@ CA60B963E0AE98AF0B5890DB,
             );
             dependencies = (
             );
-            name = "image_manipulation-staticlib";
-            productName = "libimage_manipulation_static.a";
+            name = "flutter_photon-staticlib";
+            productName = "libflutter_photon_static.a";
             productReference = CA604D57EDA33F87F8A46CE2;
             productType = "com.apple.product-type.library.static";
         };
-        CA60753C662CDE2C41FF6681 /* image_manipulation-cdylib */ = {
+        CA60753C662CDE2C41FF6681 /* flutter_photon-cdylib */ = {
             isa = PBXNativeTarget;
             buildConfigurationList = CA60790EEFC5DE2C41FF6681;
             buildPhases = (
@@ -150,8 +150,8 @@ CA60B963E0AE98AF0B5890DB,
             );
             dependencies = (
             );
-            name = "image_manipulation-cdylib";
-            productName = "image_manipulation.dylib";
+            name = "flutter_photon-cdylib";
+            productName = "flutter_photon.dylib";
             productReference = CA60753C662CEF1DBBC2F348;
             productType = "com.apple.product-type.library.dynamic";
         };
@@ -179,9 +179,9 @@ CA60B963E0AE98AF0B5890DB,
             CA6022AEE93F6E9749899E2A /* staticlib */ = {
                 isa = XCBuildConfiguration;
                 buildSettings = {
-                    PRODUCT_NAME = "image_manipulation_static";
-                    "CARGO_XCODE_CARGO_FILE_NAME" = "libimage_manipulation.a";
-                    "CARGO_XCODE_CARGO_DEP_FILE_NAME" = "libimage_manipulation.d";
+                    PRODUCT_NAME = "flutter_photon_static";
+                    "CARGO_XCODE_CARGO_FILE_NAME" = "libflutter_photon.a";
+                    "CARGO_XCODE_CARGO_DEP_FILE_NAME" = "libflutter_photon.d";
                     SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvsimulator appletvos";
                     SKIP_INSTALL = YES;
                 INSTALL_GROUP = "";
@@ -193,9 +193,9 @@ CA60B963E0AE98AF0B5890DB,
             CA604CAB0CBB6E9749899E2A /* staticlib */ = {
                 isa = XCBuildConfiguration;
                 buildSettings = {
-                    PRODUCT_NAME = "image_manipulation_static";
-                    "CARGO_XCODE_CARGO_FILE_NAME" = "libimage_manipulation.a";
-                    "CARGO_XCODE_CARGO_DEP_FILE_NAME" = "libimage_manipulation.d";
+                    PRODUCT_NAME = "flutter_photon_static";
+                    "CARGO_XCODE_CARGO_FILE_NAME" = "libflutter_photon.a";
+                    "CARGO_XCODE_CARGO_DEP_FILE_NAME" = "libflutter_photon.d";
                     SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvsimulator appletvos";
                     SKIP_INSTALL = YES;
                 INSTALL_GROUP = "";
@@ -224,9 +224,9 @@ CA60B963E0AE98AF0B5890DB,
             CA6022AEE93FDE2C41FF6681 /* cdylib */ = {
                 isa = XCBuildConfiguration;
                 buildSettings = {
-                    PRODUCT_NAME = "image_manipulation";
-                    "CARGO_XCODE_CARGO_FILE_NAME" = "libimage_manipulation.dylib";
-                    "CARGO_XCODE_CARGO_DEP_FILE_NAME" = "libimage_manipulation.d";
+                    PRODUCT_NAME = "flutter_photon";
+                    "CARGO_XCODE_CARGO_FILE_NAME" = "libflutter_photon.dylib";
+                    "CARGO_XCODE_CARGO_DEP_FILE_NAME" = "libflutter_photon.d";
                     SUPPORTED_PLATFORMS = "macosx";
                     
                 };
@@ -235,9 +235,9 @@ CA60B963E0AE98AF0B5890DB,
             CA604CAB0CBBDE2C41FF6681 /* cdylib */ = {
                 isa = XCBuildConfiguration;
                 buildSettings = {
-                    PRODUCT_NAME = "image_manipulation";
-                    "CARGO_XCODE_CARGO_FILE_NAME" = "libimage_manipulation.dylib";
-                    "CARGO_XCODE_CARGO_DEP_FILE_NAME" = "libimage_manipulation.d";
+                    PRODUCT_NAME = "flutter_photon";
+                    "CARGO_XCODE_CARGO_FILE_NAME" = "libflutter_photon.dylib";
+                    "CARGO_XCODE_CARGO_DEP_FILE_NAME" = "libflutter_photon.d";
                     SUPPORTED_PLATFORMS = "macosx";
                     
                 };
@@ -288,7 +288,7 @@ CA60B963E0AE98AF0B5890DB,
             "CARGO_XCODE_TARGET_OS[sdk=iphoneos*]" = "ios";
             "CARGO_XCODE_TARGET_OS[sdk=appletvsimulator*]" = "tvos";
             "CARGO_XCODE_TARGET_OS[sdk=appletvos*]" = "tvos";
-            PRODUCT_NAME = "image_manipulation";
+            PRODUCT_NAME = "flutter_photon";
             SDKROOT = macosx;
         
                 "CARGO_XCODE_BUILD_MODE" = "release"; /* for xcode scripts */
@@ -312,7 +312,7 @@ CA60B963E0AE98AF0B5890DB,
             "CARGO_XCODE_TARGET_OS[sdk=iphoneos*]" = "ios";
             "CARGO_XCODE_TARGET_OS[sdk=appletvsimulator*]" = "tvos";
             "CARGO_XCODE_TARGET_OS[sdk=appletvos*]" = "tvos";
-            PRODUCT_NAME = "image_manipulation";
+            PRODUCT_NAME = "flutter_photon";
             SDKROOT = macosx;
         
                 "CARGO_XCODE_BUILD_MODE" = "debug"; /* for xcode scripts */

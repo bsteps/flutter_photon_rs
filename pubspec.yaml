@@ -1,5 +1,5 @@
-name: image_manipulation
-description: A new flutter plugin project.
+name: flutter_photon
+description: Dart ffi to photon library, an image processing library written in rust. 
 version: 0.0.1
 homepage:
 
@@ -33,10 +33,10 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.bsteps.image_compression.image_manipulation
-        pluginClass: ImageManipulationPlugin
+        package: com.bsteps.flutter_photon
+        pluginClass: FlutterPhotonPlugin
       ios:
-        pluginClass: ImageManipulationPlugin
+        pluginClass: FlutterPhotonPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

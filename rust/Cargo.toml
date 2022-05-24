@@ -1,10 +1,10 @@
 [package]
-name = "image_manipulation"
+name = "flutter_photon"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "image_manipulation"
+name = "flutter_photon"
 # this is needed to build for iOS and Android.
 crate-type = ["lib", "staticlib", "cdylib"]
 

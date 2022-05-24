@@ -1,6 +1,6 @@
-# image_manipulation_example
+# flutter_photon_example
 
-Demonstrates how to use the image_manipulation plugin.
+Demonstrates how to use the flutter_photon plugin.
 
 ## Getting Started
 

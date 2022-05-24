@@ -7,9 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:image_manipulation/image_manipulation.dart';
-import 'package:image_manipulation_example/widgets/filter_list.dart';
-import 'package:image_manipulation_example/widgets/image_memory_with_loading.dart';
+import 'package:flutter_photon/flutter_photon.dart';
+import 'package:flutter_photon_example/widgets/filter_list.dart';
+import 'package:flutter_photon_example/widgets/image_memory_with_loading.dart';
 
 void main() {
   runApp(const MyApp());
@@ -264,7 +264,7 @@ class _MyAppState extends State<MyApp> {
                 if (filters.value.isEmpty) return;
                 final stopwatch = Stopwatch()..start();
 
-                final bytes = await ImageManipulation.manipulate(
+                final bytes = await FlutterPhoton.process(
                   bytes: originalImage.value!,
                   filters: filters.value.toList(),
                   outputFormat: OutputFormat.Jpeg,
@@ -326,7 +326,7 @@ class _MyAppState extends State<MyApp> {
                       Stopwatch stopwatch = Stopwatch();
 
                       return FutureBuilder<Uint8List>(
-                        future: ImageManipulation.manipulate(
+                        future: FlutterPhoton.process(
                           bytes: resizedImage.value!,
                           filters: [
                             ...value.toList(),
@@ -744,7 +744,7 @@ class _MyAppState extends State<MyApp> {
           return FloatingActionButton(
             onPressed: () async {
               final _picker = ImagePicker();
-              final image = await _picker.getImage(
+              final image = await _picker.pickImage(
                 source: ImageSource.gallery,
               );
 

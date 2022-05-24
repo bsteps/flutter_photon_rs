@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:image_manipulation/src/bridge_generated.dart';
-import 'package:image_manipulation/src/model/filters/filter.dart';
-import 'package:image_manipulation/src/util.dart';
+import 'package:flutter_photon/src/bridge_generated.dart';
+import 'package:flutter_photon/src/model/filters/filter.dart';
+import 'package:flutter_photon/src/util.dart';
 
 part 'transform.freezed.dart';
 

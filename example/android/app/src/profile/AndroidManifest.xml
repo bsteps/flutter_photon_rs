@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.bsteps.image_compression.image_manipulation_example">
+    package="com.bsteps.flutter_photon.flutter_photon_example">
     <!-- Flutter needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->

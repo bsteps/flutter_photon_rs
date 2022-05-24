@@ -1,4 +1,4 @@
-group 'com.bsteps.image_compression.image_manipulation'
+group 'com.bsteps.flutter_photon'
 version '1.0'
 
 buildscript {

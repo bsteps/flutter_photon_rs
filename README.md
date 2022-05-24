@@ -7,7 +7,7 @@ Supported platforms:
 
 ## 💻 Usage
 ```dart
-import 'package:image_manipulation/image_manipulation.dart';
+import 'package:flutter_photon/flutter_photon.dart';
 import 'package:image_picker/image_picker.dart';
 
 // Use ImagePicker to get image from source and read as bytes

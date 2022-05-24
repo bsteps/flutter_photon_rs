@@ -3,18 +3,18 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:image_manipulation/src/bridge_generated.dart';
-import 'package:image_manipulation/src/model/filters/filter.dart';
-import 'package:image_manipulation/src/util.dart';
+import 'package:flutter_photon/src/bridge_generated.dart';
+import 'package:flutter_photon/src/model/filters/filter.dart';
+import 'package:flutter_photon/src/util.dart';
 
-const base = 'image_manipulation';
+const base = 'flutter_photon';
 final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
 
 late final dylib = openDynLib(path);
-late final rustApi = ImageManipulationImpl(dylib);
+late final rustApi = FlutterPhotonImpl(dylib);
 
-class ImageManipulation {
-  static Future<Uint8List> manipulate({
+class FlutterPhoton {
+  static Future<Uint8List> process({
     required Uint8List bytes,
     List<Filter> filters = const [],
     OutputFormat outputFormat = OutputFormat.Jpeg,
@@ -47,7 +47,7 @@ class ImageManipulation {
     );
 
     if (kDebugMode && stopwatch != null) {
-      log("image_manipulation: ${stopwatch.elapsed.inMilliseconds}ms");
+      log("flutter_photon: ${stopwatch.elapsed.inMilliseconds}ms");
     }
     return data;
   }
@@ -62,7 +62,7 @@ Future<Uint8List> manipulateImage(ManipulationInput i) async {
     a: i,
   );
   if (kDebugMode && stopwatch != null) {
-    log("image_manipulation 2: ${stopwatch.elapsed.inMilliseconds}ms");
+    log("flutter_photon 2: ${stopwatch.elapsed.inMilliseconds}ms");
   }
   return value;
 }

@@ -1,4 +1,4 @@
-package com.bsteps.image_compression.image_manipulation;
+package com.bsteps.flutter_photon;
 
 import androidx.annotation.NonNull;
 
@@ -8,8 +8,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-/** ImageManipulationPlugin */
-public class ImageManipulationPlugin implements FlutterPlugin, MethodCallHandler {
+/** FlutterPhotonPlugin */
+public class FlutterPhotonPlugin implements FlutterPlugin, MethodCallHandler {
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -18,7 +18,7 @@ public class ImageManipulationPlugin implements FlutterPlugin, MethodCallHandler
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "image_manipulation");
+    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_photon");
     channel.setMethodCallHandler(this);
   }
 
