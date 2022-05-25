@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -295,7 +296,9 @@ class _MyAppState extends State<MyApp> {
                       return ValueListenableBuilder<Set<Filter>>(
                         valueListenable: filters,
                         builder: (context, filters, child) {
-                          if (value == null || filters.isNotEmpty || sliderValue != 0) {
+                          if (value == null ||
+                              filters.isNotEmpty ||
+                              sliderValue != 0) {
                             return Container();
                           }
 
@@ -320,7 +323,8 @@ class _MyAppState extends State<MyApp> {
                   return ValueListenableBuilder<Set<Filter>>(
                     valueListenable: filters,
                     builder: (context, value, child) {
-                      if (resizedImage.value == null || (filters.value.isEmpty && sliderValue == 0)) {
+                      if (resizedImage.value == null ||
+                          (filters.value.isEmpty && sliderValue == 0)) {
                         return Container();
                       }
                       Stopwatch stopwatch = Stopwatch();
@@ -338,15 +342,18 @@ class _MyAppState extends State<MyApp> {
                           outputFormat: OutputFormat.Jpeg,
                         ),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.none) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.none) {
                             stopwatch.reset();
                             stopwatch.start();
-                          } else if (snapshot.connectionState == ConnectionState.waiting) {
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             if (!stopwatch.isRunning) {
                               stopwatch.reset();
                               stopwatch.start();
                             }
-                          } else if (snapshot.connectionState == ConnectionState.done) {
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.done) {
                             stopwatch.stop();
                           }
 
@@ -355,13 +362,16 @@ class _MyAppState extends State<MyApp> {
                             children: [
                               LayoutBuilder(builder: (context, size) {
                                 return ImageMemoryWithLoading(
-                                  image: snapshot.data == null ? resizedImage.value! : snapshot.data!,
+                                  image: snapshot.data == null
+                                      ? resizedImage.value!
+                                      : snapshot.data!,
                                   width: size.constrainWidth(),
                                   // cacheWidth: size.constrainWidth().toInt() * window.devicePixelRatio.ceil(),
                                   timeInMs: stopwatch.elapsed.inMilliseconds,
                                 );
                               }),
-                              if (snapshot.data == null) const CircularProgressIndicator(),
+                              if (snapshot.data == null)
+                                const CircularProgressIndicator(),
                             ],
                           );
                         },
@@ -743,19 +753,31 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: Builder(builder: (context) {
           return FloatingActionButton(
             onPressed: () async {
-              final _picker = ImagePicker();
-              final image = await _picker.pickImage(
-                source: ImageSource.gallery,
-              );
+              Uint8List? imageBytes;
+              if (Platform.isAndroid) {
+                final _picker = ImagePicker();
+                final image = await _picker.pickImage(
+                  source: ImageSource.gallery,
+                );
 
-              if (image != null) {
-                final imageBytes = await image.readAsBytes();
+                imageBytes = await image?.readAsBytes();
+              } else {
+                final blendImage = await rootBundle.load('images/blend.jpg');
+                imageBytes = Uint8List.view(
+                  blendImage.buffer,
+                  blendImage.offsetInBytes,
+                  blendImage.lengthInBytes,
+                );
+              }
+
+              if (imageBytes != null) {
                 originalImage.value = imageBytes;
 
                 final stopwatch = Stopwatch()..start();
                 final codec = await instantiateImageCodec(
                   imageBytes,
-                  targetWidth: MediaQuery.of(context).size.width.toInt() * window.devicePixelRatio.ceil(),
+                  targetWidth: MediaQuery.of(context).size.width.toInt() *
+                      window.devicePixelRatio.ceil(),
                 );
                 final frameInfo = await codec.getNextFrame();
                 final uiImage = frameInfo.image;
@@ -766,8 +788,9 @@ class _MyAppState extends State<MyApp> {
                 final resizedByteData = await uiImage.toByteData(
                   format: ImageByteFormat.png,
                 ) as ByteData;
-                final resizedUint8List =
-                    resizedByteData.buffer.asUint8List(resizedByteData.offsetInBytes, resizedByteData.lengthInBytes);
+                final resizedUint8List = resizedByteData.buffer.asUint8List(
+                    resizedByteData.offsetInBytes,
+                    resizedByteData.lengthInBytes);
                 resizedImage.value = resizedUint8List;
                 log("Resize Image: ${stopwatch.elapsedMilliseconds}ms");
 
