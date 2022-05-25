@@ -4,6 +4,7 @@
 
 Supported platforms:
 - Android
+- IOS
 
 ## 💻 Usage
 ```dart
@@ -21,7 +22,7 @@ if (image != null) {
   
   // returns Uint8List which you can use to store, 
   // or show on Image.memory() widget
-  final bytes = await ImageManipulation.manipulate(
+  final bytes = await FlutterPhoton.process(
     bytes: imageBytes,
     filters: [
       Monochrome.grayscale(),
@@ -39,7 +40,7 @@ if (image != null) {
 - [x] Fix Exif Reading (Image Rotation) Issue
 - [x] Make Proper README.md with Documentation
 - [ ] Publish on pub.dev
-- [ ] Add Support For IOS
+- [X] Add Support For IOS
 - [ ] Write Rust And Flutter Test
 - [ ] Benchmark
 - [ ] Refactor Code for readability and efficiency
