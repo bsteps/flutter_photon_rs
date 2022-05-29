@@ -10,10 +10,10 @@ import 'package:flutter_photon_rs/src/util.dart';
 const base = 'flutter_photon_rs';
 final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
 
-late final dylib = openDynLib(path);
-late final rustApi = FlutterPhotonRsImpl(dylib);
+final dylib = openDynLib(path);
+final rustApi = FlutterPhotonRsImpl(dylib);
 
-class FlutterPhoton {
+class Photon {
   static Future<Uint8List> process({
     required Uint8List bytes,
     List<Filter> filters = const [],

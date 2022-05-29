@@ -265,7 +265,7 @@ class _MyAppState extends State<MyApp> {
                 if (filters.value.isEmpty) return;
                 final stopwatch = Stopwatch()..start();
 
-                final bytes = await FlutterPhoton.process(
+                final bytes = await Photon.process(
                   bytes: originalImage.value!,
                   filters: filters.value.toList(),
                   outputFormat: OutputFormat.Jpeg,
@@ -327,7 +327,7 @@ class _MyAppState extends State<MyApp> {
                       Stopwatch stopwatch = Stopwatch();
 
                       return FutureBuilder<Uint8List>(
-                        future: FlutterPhoton.process(
+                        future: Photon.process(
                           bytes: resizedImage.value!,
                           filters: [
                             ...value.toList(),
