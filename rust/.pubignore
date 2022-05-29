@@ -1,0 +1,24 @@
+# Rust Binaries
+target/*
+!target/
+
+target/release
+!target/universal/
+
+target/x86_64-linux-android/*
+target/x86_64-linux-android/release/*
+!target/x86_64-linux-android/
+!target/x86_64-linux-android/release/
+!target/x86_64-linux-android/release/*.so
+
+target/aarch64-linux-android/*
+target/aarch64-linux-android/release/*
+!target/aarch64-linux-android/
+!target/aarch64-linux-android/release/
+!target/aarch64-linux-android/release/*.so
+
+target/armv7-linux-androideabi/*
+target/armv7-linux-androideabi/release/*
+!target/armv7-linux-androideabi/
+!target/armv7-linux-androideabi/release/
+!target/armv7-linux-androideabi/release/*.so

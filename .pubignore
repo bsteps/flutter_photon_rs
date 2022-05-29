@@ -678,31 +678,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Rust Binaries
-rust/target/*
-!rust/target/
-
-rust/target/release
-!rust/target/universal/
-
-rust/target/x86_64-linux-android/*
-rust/target/x86_64-linux-android/release/*
-!rust/target/x86_64-linux-android/
-!rust/target/x86_64-linux-android/release/
-!rust/target/x86_64-linux-android/release/*.so
-
-rust/target/aarch64-linux-android/*
-rust/target/aarch64-linux-android/release/*
-!rust/target/aarch64-linux-android/
-!rust/target/aarch64-linux-android/release/
-!rust/target/aarch64-linux-android/release/*.so
-
-rust/target/armv7-linux-androideabi/*
-rust/target/armv7-linux-androideabi/release/*
-!rust/target/armv7-linux-androideabi/
-!rust/target/armv7-linux-androideabi/release/
-!rust/target/armv7-linux-androideabi/release/*.so
-
 
 ### https://raw.github.com/github/gitignore/340e2fe08a2356c2e3760ff58c3a9e1fddf08060/Maven.gitignore
 pom.xml.tag
