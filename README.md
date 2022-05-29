@@ -1,6 +1,6 @@
 # Photon For Flutter
  
-`flutter_photon` is dart ffi to [`photon`](https://github.com/silvia-odwyer/photon) library, Photon is a high-performance Rust image processing library, which compiles to WebAssembly, allowing for safe, blazing-fast image processing both natively and on the web.
+`flutter_photon_rs` is dart ffi to [`photon`](https://github.com/silvia-odwyer/photon) library, Photon is a high-performance Rust image processing library, which compiles to WebAssembly, allowing for safe, blazing-fast image processing both natively and on the web.
 
 Supported platforms:
 - Android
@@ -8,7 +8,7 @@ Supported platforms:
 
 ## 💻 Usage
 ```dart
-import 'package:flutter_photon/flutter_photon.dart';
+import 'package:flutter_photon_rs/flutter_photon_rs.dart';
 import 'package:image_picker/image_picker.dart';
 
 // Use ImagePicker to get image from source and read as bytes
@@ -22,7 +22,7 @@ if (image != null) {
   
   // returns Uint8List which you can use to store, 
   // or show on Image.memory() widget
-  final bytes = await FlutterPhoton.process(
+  final bytes = await Photon.process(
     bytes: imageBytes,
     filters: [
       Monochrome.grayscale(),

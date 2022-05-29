@@ -3,15 +3,15 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_photon/src/bridge_generated.dart';
-import 'package:flutter_photon/src/model/filters/filter.dart';
-import 'package:flutter_photon/src/util.dart';
+import 'package:flutter_photon_rs/src/bridge_generated.dart';
+import 'package:flutter_photon_rs/src/model/filters/filter.dart';
+import 'package:flutter_photon_rs/src/util.dart';
 
-const base = 'flutter_photon';
+const base = 'flutter_photon_rs';
 final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
 
 late final dylib = openDynLib(path);
-late final rustApi = FlutterPhotonImpl(dylib);
+late final rustApi = FlutterPhotonRsImpl(dylib);
 
 class FlutterPhoton {
   static Future<Uint8List> process({
@@ -47,7 +47,7 @@ class FlutterPhoton {
     );
 
     if (kDebugMode && stopwatch != null) {
-      log("flutter_photon: ${stopwatch.elapsed.inMilliseconds}ms");
+      log("flutter_photon_rs: ${stopwatch.elapsed.inMilliseconds}ms");
     }
     return data;
   }
@@ -62,7 +62,7 @@ Future<Uint8List> manipulateImage(ManipulationInput i) async {
     a: i,
   );
   if (kDebugMode && stopwatch != null) {
-    log("flutter_photon 2: ${stopwatch.elapsed.inMilliseconds}ms");
+    log("flutter_photon_rs 2: ${stopwatch.elapsed.inMilliseconds}ms");
   }
   return value;
 }

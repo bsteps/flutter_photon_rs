@@ -1,4 +1,4 @@
-import 'package:flutter_photon/src/bridge_generated.dart';
+import 'package:flutter_photon_rs/src/bridge_generated.dart';
 
 export './monochrome.dart';
 export './preset_filter.dart';

@@ -3,7 +3,7 @@ import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter_photon/src/bridge_generated.dart';
+import 'package:flutter_photon_rs/src/bridge_generated.dart';
 
 ffi.DynamicLibrary openDynLib(String path) {
   if (Platform.environment.containsKey('FLUTTER_TEST')) {

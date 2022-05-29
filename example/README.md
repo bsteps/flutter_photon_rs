@@ -1,6 +1,6 @@
-# flutter_photon_example
+# flutter_photon_rs_example
 
-Demonstrates how to use the flutter_photon plugin.
+Demonstrates how to use the flutter_photon_rs plugin.
 
 ## Getting Started
 

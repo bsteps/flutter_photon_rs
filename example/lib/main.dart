@@ -8,9 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:flutter_photon/flutter_photon.dart';
-import 'package:flutter_photon_example/widgets/filter_list.dart';
-import 'package:flutter_photon_example/widgets/image_memory_with_loading.dart';
+import 'package:flutter_photon_rs/flutter_photon_rs.dart';
+import 'package:flutter_photon_rs_example/widgets/filter_list.dart';
+import 'package:flutter_photon_rs_example/widgets/image_memory_with_loading.dart';
 
 void main() {
   runApp(const MyApp());
@@ -296,9 +296,7 @@ class _MyAppState extends State<MyApp> {
                       return ValueListenableBuilder<Set<Filter>>(
                         valueListenable: filters,
                         builder: (context, filters, child) {
-                          if (value == null ||
-                              filters.isNotEmpty ||
-                              sliderValue != 0) {
+                          if (value == null || filters.isNotEmpty || sliderValue != 0) {
                             return Container();
                           }
 
@@ -323,8 +321,7 @@ class _MyAppState extends State<MyApp> {
                   return ValueListenableBuilder<Set<Filter>>(
                     valueListenable: filters,
                     builder: (context, value, child) {
-                      if (resizedImage.value == null ||
-                          (filters.value.isEmpty && sliderValue == 0)) {
+                      if (resizedImage.value == null || (filters.value.isEmpty && sliderValue == 0)) {
                         return Container();
                       }
                       Stopwatch stopwatch = Stopwatch();
@@ -342,18 +339,15 @@ class _MyAppState extends State<MyApp> {
                           outputFormat: OutputFormat.Jpeg,
                         ),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.none) {
+                          if (snapshot.connectionState == ConnectionState.none) {
                             stopwatch.reset();
                             stopwatch.start();
-                          } else if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
+                          } else if (snapshot.connectionState == ConnectionState.waiting) {
                             if (!stopwatch.isRunning) {
                               stopwatch.reset();
                               stopwatch.start();
                             }
-                          } else if (snapshot.connectionState ==
-                              ConnectionState.done) {
+                          } else if (snapshot.connectionState == ConnectionState.done) {
                             stopwatch.stop();
                           }
 
@@ -362,16 +356,13 @@ class _MyAppState extends State<MyApp> {
                             children: [
                               LayoutBuilder(builder: (context, size) {
                                 return ImageMemoryWithLoading(
-                                  image: snapshot.data == null
-                                      ? resizedImage.value!
-                                      : snapshot.data!,
+                                  image: snapshot.data == null ? resizedImage.value! : snapshot.data!,
                                   width: size.constrainWidth(),
                                   // cacheWidth: size.constrainWidth().toInt() * window.devicePixelRatio.ceil(),
                                   timeInMs: stopwatch.elapsed.inMilliseconds,
                                 );
                               }),
-                              if (snapshot.data == null)
-                                const CircularProgressIndicator(),
+                              if (snapshot.data == null) const CircularProgressIndicator(),
                             ],
                           );
                         },
@@ -776,8 +767,7 @@ class _MyAppState extends State<MyApp> {
                 final stopwatch = Stopwatch()..start();
                 final codec = await instantiateImageCodec(
                   imageBytes,
-                  targetWidth: MediaQuery.of(context).size.width.toInt() *
-                      window.devicePixelRatio.ceil(),
+                  targetWidth: MediaQuery.of(context).size.width.toInt() * window.devicePixelRatio.ceil(),
                 );
                 final frameInfo = await codec.getNextFrame();
                 final uiImage = frameInfo.image;
@@ -788,9 +778,8 @@ class _MyAppState extends State<MyApp> {
                 final resizedByteData = await uiImage.toByteData(
                   format: ImageByteFormat.png,
                 ) as ByteData;
-                final resizedUint8List = resizedByteData.buffer.asUint8List(
-                    resizedByteData.offsetInBytes,
-                    resizedByteData.lengthInBytes);
+                final resizedUint8List =
+                    resizedByteData.buffer.asUint8List(resizedByteData.offsetInBytes, resizedByteData.lengthInBytes);
                 resizedImage.value = resizedUint8List;
                 log("Resize Image: ${stopwatch.elapsedMilliseconds}ms");
 

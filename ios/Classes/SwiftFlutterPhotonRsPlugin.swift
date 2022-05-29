@@ -1,10 +1,10 @@
 import Flutter
 import UIKit
 
-public class SwiftFlutterPhotonPlugin: NSObject, FlutterPlugin {
+public class SwiftFlutterPhotonRsPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_photon", binaryMessenger: registrar.messenger())
-    let instance = SwiftFlutterPhotonPlugin()
+    let channel = FlutterMethodChannel(name: "flutter_photon_rs", binaryMessenger: registrar.messenger())
+    let instance = SwiftFlutterPhotonRsPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
 

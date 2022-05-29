@@ -1,17 +1,17 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint flutter_photon.podspec` to validate before publishing.
+# Run `pod lib lint flutter_photon_rs.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'flutter_photon'
+  s.name             = 'flutter_photon_rs'
   s.version          = '0.0.1'
-  s.summary          = 'A new flutter plugin project.'
+  s.summary          = 'Dart ffi to photon library, an image processing library written in rust. '
   s.description      = <<-DESC
-A new flutter plugin project.
+  Dart ffi to photon library, an image processing library written in rust. 
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Bsteps' => 'bsteps.dev@gmail.com' }
   s.source           = { :path => '.' }
   s.public_header_files = 'Classes**/*.h'
   s.source_files = 'Classes/**/*'

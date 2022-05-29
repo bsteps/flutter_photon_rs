@@ -1,4 +1,4 @@
-group 'com.bsteps.flutter_photon'
+group 'com.bsteps.flutter_photon_rs'
 version '1.0'
 
 buildscript {

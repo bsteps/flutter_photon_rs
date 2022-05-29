@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_photon/flutter_photon.dart';
-import 'package:flutter_photon_example/widgets/preview_buttom.dart';
+import 'package:flutter_photon_rs/flutter_photon_rs.dart';
+import 'package:flutter_photon_rs_example/widgets/preview_buttom.dart';
 
 class FilterList extends StatelessWidget {
   const FilterList({

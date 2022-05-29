@@ -2,9 +2,9 @@ import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter_photon/src/bridge_generated.dart';
-import 'package:flutter_photon/src/model/filters/filter.dart';
-import 'package:flutter_photon/src/util.dart';
+import 'package:flutter_photon_rs/src/bridge_generated.dart';
+import 'package:flutter_photon_rs/src/model/filters/filter.dart';
+import 'package:flutter_photon_rs/src/util.dart';
 
 part 'multiple.freezed.dart';
 

@@ -1,10 +1,10 @@
 [package]
-name = "flutter_photon"
+name = "flutter_photon_rs"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "flutter_photon"
+name = "flutter_photon_rs"
 # this is needed to build for iOS and Android.
 crate-type = ["lib", "staticlib", "cdylib"]
 

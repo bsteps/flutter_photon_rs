@@ -1,5 +1,5 @@
-name: flutter_photon_example
-description: Demonstrates how to use the flutter_photon plugin.
+name: flutter_photon_rs_example
+description: Demonstrates how to use the flutter_photon_rs plugin.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -18,7 +18,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
-  flutter_photon:
+  flutter_photon_rs:
     path: ../
   image_gallery_saver: ^1.7.1
   image_picker: ^0.8.5+3
